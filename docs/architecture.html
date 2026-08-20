@@ -298,7 +298,7 @@
           <text class="lbl sm mut" x="860" y="66" text-anchor="middle">beyond sweep extreme</text>
           <rect class="node" x="760" y="122" width="200" height="48" rx="9"/>
           <text class="lbl sm" x="860" y="142" text-anchor="middle">Targets</text>
-          <text class="lbl sm mut" x="860" y="158" text-anchor="middle">draw on liquidity (pools)</text>
+          <text class="lbl sm mut" x="860" y="158" text-anchor="middle">DOL: pools · sessions · IPDA</text>
 
           <!-- confluence -->
           <rect class="grp" x="256" y="228" width="424" height="64" rx="10"/>
@@ -400,6 +400,27 @@
         <p>NY-clock windows — Asia, London, NY AM/PM — plus silver-bullet and macro
         sub-windows. DST-aware via the tz database.</p>
         <code>America/New_York → window</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>sessions</h3><span class="mod">sessions.py</span></div>
+        <p>The NY-time session map (Asia / London / NY AM / Lunch / PM / London
+        Close); each session's high and low are resting liquidity.</p>
+        <code>session_of(t) · session_range()</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>asian_range</h3><span class="mod">asian_range.py</span></div>
+        <p>The Asia range London delivers from — bounds, which side the Judas
+        swing sweeps, and 0.5–2× extension targets.</p>
+        <code>[asian_low, asian_high] · n× projections</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>ipda</h3><span class="mod">ipda.py</span></div>
+        <p>The 20/40/60 trading-day lookback highs and lows — the untaken extremes
+        price is drawn toward. Feeds the draw-on-liquidity set.</p>
+        <code>20 / 40 / 60-day high &amp; low</code>
       </div>
 
       <div class="card">

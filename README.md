@@ -32,6 +32,9 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 | **Liquidity pools** | `concepts/liquidity.py` | BSL/SSL at swings; EQH/EQL clusters within a pip tolerance |
 | **Liquidity sweep** | `concepts/liquidity.py` | wick beyond pool + close back inside + ≥60% wick |
 | **Killzones** | `concepts/killzones.py` | NY-time windows (Asia, London, NY AM/PM) + silver bullet, DST-aware |
+| **Session ranges** | `concepts/sessions.py` | NY-time session map; most-recent session high/low |
+| **Asian range** | `concepts/asian_range.py` | Asia-session high/low, Judas-sweep side, 0.5–2× projections |
+| **IPDA lookback** | `concepts/ipda.py` | 20/40/60 trading-day reference highs/lows |
 | **OTE** | `concepts/ote.py` | 0.62–0.79 retracement band of a measured leg |
 
 Each detector marks **state** where the concept has it: FVGs and order blocks
@@ -100,8 +103,9 @@ The included scanner encodes the classic ICT reversal:
    algorithm's signature to reverse.
 3. **Entry** = the FVG left by that MSS (consequent encroachment) or the order
    block behind it (mean threshold).
-4. **Stop** beyond the sweep extreme; **targets** = the opposite liquidity
-   pools (the draw on liquidity), nearest first.
+4. **Stop** beyond the sweep extreme; **targets** = the draw-on-liquidity set
+   (the IPDA reference set: liquidity pools + session/Asian-range extremes +
+   IPDA 20/40/60-day levels), nearest first.
 
 Confluences add to a score: active killzone, HTF bias aligned, entry inside the
 OTE band, whether a dense EQH/EQL pool was the one swept, and — per ICT's
@@ -148,7 +152,8 @@ ictlib/
   sample_setups.py     canonical hand-authored setups (shared by demo + tests)
   concepts/            structure, displacement, fvg, order_blocks,
                        breaker_blocks, rejection_blocks, imbalance,
-                       liquidity, pd_arrays, killzones, ote
+                       liquidity, pd_arrays, sessions, asian_range, ipda,
+                       killzones, ote
   data/                oanda.py (v20 REST), csv_loader.py
 examples/              generate_sample.py, rendered chart
 sample_data/           EUR_USD_M15.csv
@@ -159,7 +164,7 @@ tests/                 22 deterministic tests
 
 - [x] **PD arrays** — dealing range, equilibrium, premium/discount classification.
 - [x] **Breaker & rejection blocks, volume imbalance** — the rest of the PD-array family.
-- [ ] Asian range, session ranges, IPDA lookback ranges.
+- [x] **Sessions, Asian range, IPDA lookback** — time-based draw-on-liquidity levels.
 - [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
 - [ ] Backtester on top of `scan()` with equity curve + R distribution.
 - [ ] Named models: Silver Bullet, Judas Swing, Turtle Soup, 2022 model.
