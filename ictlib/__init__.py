@@ -26,7 +26,7 @@ from .models import (
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, TFRead, MTFContext, Unicorn,
     InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
-    SMTDivergence, NewsEvent, Signal, to_jsonable,
+    SMTDivergence, NewsEvent, OpeningGap, Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
@@ -47,7 +47,7 @@ __all__ = [
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
     "TurtleSoup", "CRTSetup", "QuarterlyContext", "TFRead", "MTFContext",
     "Unicorn", "InversionFVG", "BalancedPriceRange", "LiquidityVoid",
-    "PropulsionBlock", "SMTDivergence", "NewsEvent",
+    "PropulsionBlock", "SMTDivergence", "NewsEvent", "OpeningGap",
     "find_smt_divergence", "dollar_index_smt", "intermarket_bias",
     "in_blackout", "news_windows", "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",

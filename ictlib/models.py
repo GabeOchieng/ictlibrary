@@ -545,6 +545,23 @@ class Sweep:
 # Signal (produced by the scanner that sits on top of the primitives)
 # --------------------------------------------------------------------------- #
 @dataclass
+class OpeningGap:
+    """New Day / New Week Opening Gap (concepts/31-models/ndog, nwog): the gap
+    between a prior session close and the new open — a fill target / reference."""
+
+    kind: str           # "NDOG" | "NWOG"
+    low: float
+    high: float
+    direction: str      # "bull" (gap up) | "bear"
+    ref_index: int      # prior close candle
+    open_index: int     # new-open candle
+
+    @property
+    def ce(self) -> float:
+        return (self.low + self.high) / 2.0
+
+
+@dataclass
 class Unicorn:
     """Unicorn model — an A+ confluence stack (concepts/31-models/unicorn-model):
     a breaker block with a same-direction FVG nested inside, HTF-bias aligned,

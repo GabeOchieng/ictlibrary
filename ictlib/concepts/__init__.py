@@ -26,6 +26,7 @@ from .fvg_variants import find_inversion_fvgs, find_bpr, find_nested_fvgs
 from .ob_variants import find_propulsion_blocks
 from .liquidity import find_liquidity_voids
 from .structure import classify_internal_external, range_state
+from .opening_gaps import find_ndog, find_nwog
 
 __all__ = [
     "avg_body", "displacement_direction", "is_displacement",
@@ -44,4 +45,5 @@ __all__ = [
     "find_inversion_fvgs", "find_bpr", "find_nested_fvgs",
     "find_propulsion_blocks", "find_liquidity_voids",
     "classify_internal_external", "range_state",
+    "find_ndog", "find_nwog",
 ]

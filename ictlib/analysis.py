@@ -17,7 +17,7 @@ from .models import (
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, MTFContext, Unicorn,
     InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
-    SMTDivergence, NewsEvent,
+    SMTDivergence, NewsEvent, OpeningGap,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -29,6 +29,7 @@ from .concepts import (
     find_inversion_fvgs, find_bpr, find_nested_fvgs,
     find_propulsion_blocks, find_liquidity_voids,
     classify_internal_external, range_state,
+    find_ndog, find_nwog,
 )
 
 
@@ -61,6 +62,8 @@ class Analysis:
     range_state: str = "unknown"
     smt_divergences: List[SMTDivergence] = field(default_factory=list)
     news_blackout: Optional[NewsEvent] = None
+    ndog: Optional[OpeningGap] = None
+    nwog: Optional[OpeningGap] = None
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -142,6 +145,8 @@ class Analysis:
             "range_state": self.range_state,
             "smt_divergences": len(self.smt_divergences),
             "news_blackout": self.news_blackout.name if self.news_blackout else None,
+            "ndog": bool(self.ndog),
+            "nwog": bool(self.nwog),
         }
 
 
@@ -203,6 +208,8 @@ def analyze(
     if news_events and candles:
         from .news import in_blackout
         blackout = in_blackout(candles[-1].ts, news_events)
+    ndog = find_ndog(candles)
+    nwog = find_nwog(candles)
 
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
@@ -244,6 +251,8 @@ def analyze(
         range_state=rstate,
         smt_divergences=smt,
         news_blackout=blackout,
+        ndog=ndog,
+        nwog=nwog,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,
