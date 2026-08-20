@@ -103,7 +103,7 @@ def backtest(
     warmup: int = 8,
     lookback: Optional[int] = None,     # analyse only the last N bars each step (speed)
     htf_timeframes: Optional[List[int]] = None,
-    stop_mode: str = "structure",
+    stop_mode: str = "sweep",
     use_sd_targets: bool = True,
 ) -> BacktestResult:
     from .concepts import infer_pip_size

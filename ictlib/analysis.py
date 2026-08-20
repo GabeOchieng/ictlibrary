@@ -17,6 +17,7 @@ from .models import (
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, MTFContext, Unicorn,
     InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
+    SMTDivergence, NewsEvent,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -58,6 +59,8 @@ class Analysis:
     liquidity_voids: List[LiquidityVoid] = field(default_factory=list)
     propulsion_blocks: List[PropulsionBlock] = field(default_factory=list)
     range_state: str = "unknown"
+    smt_divergences: List[SMTDivergence] = field(default_factory=list)
+    news_blackout: Optional[NewsEvent] = None
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -137,6 +140,8 @@ class Analysis:
             "liquidity_voids": len(self.liquidity_voids),
             "propulsion_blocks": len(self.propulsion_blocks),
             "range_state": self.range_state,
+            "smt_divergences": len(self.smt_divergences),
+            "news_blackout": self.news_blackout.name if self.news_blackout else None,
         }
 
 
@@ -147,6 +152,9 @@ def analyze(
     pip: Optional[float] = None,
     eq_tolerance_pips: float = 5.0,
     htf_timeframes: Optional[List[int]] = None,
+    smt_reference: Optional[List[Candle]] = None,
+    smt_correlation: str = "positive",
+    news_events: Optional[List[NewsEvent]] = None,
 ) -> Analysis:
     """Run the full primitive stack over ``candles``.
 
@@ -187,6 +195,15 @@ def analyze(
     propulsion = find_propulsion_blocks(candles, obs)
     rstate = range_state(candles)
 
+    smt = []
+    if smt_reference is not None:
+        from .smt import find_smt_divergence
+        smt = find_smt_divergence(candles, smt_reference, correlation=smt_correlation)
+    blackout = None
+    if news_events and candles:
+        from .news import in_blackout
+        blackout = in_blackout(candles[-1].ts, news_events)
+
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
         for f in fvgs:
@@ -225,6 +242,8 @@ def analyze(
         liquidity_voids=voids,
         propulsion_blocks=propulsion,
         range_state=rstate,
+        smt_divergences=smt,
+        news_blackout=blackout,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

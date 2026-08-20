@@ -31,7 +31,7 @@ def scan(
     mss_window: int = 12,
     min_score: int = 2,
     require_htf_alignment: bool = False,
-    stop_mode: str = "structure",   # "structure" (PD-array invalidation) | "sweep"
+    stop_mode: str = "sweep",       # "sweep" (beyond swept extreme) | "structure"
     use_sd_targets: bool = True,     # add standard-deviation projection targets
 ) -> List[Signal]:
     """Produce signals from a completed :class:`Analysis`.
@@ -304,5 +304,14 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
            for u in analysis.unicorns):
         reasons.append("Unicorn A+ zone at entry (breaker + nested FVG)")
         score += 2
+
+    # SMT divergence confirmation (intermarket / correlated pair).
+    if any(d.direction == want_dir2 for d in analysis.smt_divergences[-3:]):
+        reasons.append("SMT divergence confirms direction")
+        score += 1
+
+    # News blackout — flag entries inside a high-impact no-trade window.
+    if analysis.news_blackout is not None:
+        reasons.append(f"⚠ news blackout ({analysis.news_blackout.name})")
 
     return reasons, score

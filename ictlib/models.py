@@ -500,6 +500,29 @@ class MTFContext:
         return self.bias == want
 
 
+@dataclass
+class SMTDivergence:
+    """Smart-Money-Technique divergence between two correlated assets
+    (concepts/16-smt-divergence). Asset A confirms a new extreme; asset B fails."""
+
+    index: int          # the confirming swing on asset A
+    ts: datetime
+    direction: str      # "bull" (at lows) | "bear" (at highs)
+    correlation: str    # "positive" | "negative"
+    a_level: float
+    b_level: float
+
+
+@dataclass(frozen=True)
+class NewsEvent:
+    """A scheduled economic-calendar event (concepts/30-news-driven)."""
+
+    ts: datetime
+    name: str
+    impact: str = "high"   # high | medium | low
+    kind: str = "other"    # fomc | fomc_presser | nfp | cpi | other
+
+
 @dataclass(frozen=True)
 class Sweep:
     """Liquidity sweep / raid (concepts/02-liquidity/liquidity-sweep).

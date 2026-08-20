@@ -26,7 +26,7 @@ from .models import (
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, TFRead, MTFContext, Unicorn,
     InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
-    Signal, to_jsonable,
+    SMTDivergence, NewsEvent, Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
@@ -34,6 +34,9 @@ from .risk import RiskParams, position_size, r_multiple, size_signal
 from .backtest import backtest, BacktestResult, Trade
 from .mtf import multi_timeframe_bias, resample_tf
 from .setups import classify_models, find_unicorns
+from .smt import find_smt_divergence
+from .intermarket import dollar_index_smt, intermarket_bias
+from .news import in_blackout, news_windows
 from . import concepts
 
 __version__ = "0.8.0"
@@ -44,7 +47,9 @@ __all__ = [
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
     "TurtleSoup", "CRTSetup", "QuarterlyContext", "TFRead", "MTFContext",
     "Unicorn", "InversionFVG", "BalancedPriceRange", "LiquidityVoid",
-    "PropulsionBlock", "Signal", "to_jsonable",
+    "PropulsionBlock", "SMTDivergence", "NewsEvent",
+    "find_smt_divergence", "dollar_index_smt", "intermarket_bias",
+    "in_blackout", "news_windows", "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "RiskParams", "position_size", "r_multiple", "size_signal",
     "backtest", "BacktestResult", "Trade",
