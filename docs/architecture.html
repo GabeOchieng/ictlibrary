@@ -1,0 +1,389 @@
+<title>ictlib architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#eef0f2; --paper:#f8f9fb; --surface:#ffffff;
+    --ink:#1a2028; --muted:#616b78; --line:#d3d8de; --grid:#e2e6ea;
+    --accent:#b07400; --accent-tint:rgba(176,116,0,.10);
+    --bull:#0f9d8a; --bear:#d75c58;
+    --shadow:0 1px 2px rgba(20,30,45,.05),0 8px 24px rgba(20,30,45,.06);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0c0f14; --paper:#11151b; --surface:#161b22;
+      --ink:#e7edf3; --muted:#93a0ad; --line:#28313b; --grid:#1b222b;
+      --accent:#e7b24a; --accent-tint:rgba(231,178,74,.12);
+      --bull:#2bb9a3; --bear:#e0706b;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c0f14; --paper:#11151b; --surface:#161b22;
+    --ink:#e7edf3; --muted:#93a0ad; --line:#28313b; --grid:#1b222b;
+    --accent:#e7b24a; --accent-tint:rgba(231,178,74,.12);
+    --bull:#2bb9a3; --bear:#e0706b;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:56px 24px 80px}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+  /* header */
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--accent);
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(30px,5vw,46px); font-weight:700; letter-spacing:-.02em;
+    line-height:1.05; margin:0 0 16px; text-wrap:balance;
+  }
+  .lede{font-size:18px; color:var(--muted); max-width:64ch; margin:0}
+  .lede b{color:var(--ink); font-weight:600}
+
+  .rule{height:1px; background:var(--line); border:0; margin:44px 0}
+
+  h2{
+    font-size:13px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 20px;
+    display:flex; align-items:center; gap:12px;
+  }
+  h2::before{content:""; width:22px; height:2px; background:var(--accent); flex:none}
+
+  /* figure */
+  figure{margin:0}
+  .panel{
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:22px; box-shadow:var(--shadow);
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px; background-position:-1px -1px;
+  }
+  .scroll{overflow-x:auto}
+  svg.fig{display:block; width:100%; height:auto; min-width:640px; color:var(--ink)}
+  figcaption{margin-top:14px; font-size:14px; color:var(--muted); max-width:74ch}
+  figcaption b{color:var(--ink); font-weight:600}
+
+  /* svg node styling (page CSS applies to inline svg) */
+  .node{fill:var(--surface); stroke:currentColor; stroke-width:1.4}
+  .grp{fill:none; stroke:var(--line); stroke-width:1.4; stroke-dasharray:5 4}
+  .node.accent{stroke:var(--accent); fill:var(--accent-tint); stroke-width:1.8}
+  .node.dash{stroke:var(--muted); stroke-dasharray:5 4; fill:none}
+  .lbl{fill:var(--ink); font-family:"IBM Plex Mono",monospace; font-weight:500}
+  .lbl.big{font-size:15px}
+  .lbl.sm{font-size:12px; font-weight:400}
+  .lbl.accent{fill:var(--accent); font-weight:600}
+  .lbl.mut{fill:var(--muted)}
+  .edge{stroke:currentColor; stroke-width:1.4; fill:none}
+  .edge.accent{stroke:var(--accent); stroke-width:1.8}
+  .edge.dash{stroke:var(--muted); stroke-dasharray:5 4}
+  .etxt{fill:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:11px}
+  .bull{fill:var(--bull)} .bear{fill:var(--bear)}
+
+  /* concept reference grid */
+  .grid-cards{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px;
+  }
+  .card .top{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
+  .card h3{margin:0; font-family:"IBM Plex Mono",monospace; font-size:15px; font-weight:600}
+  .card .mod{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted)}
+  .card p{margin:0; font-size:13.5px; color:var(--muted)}
+  .card code{
+    font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:6px;
+    padding:2px 6px; display:inline-block;
+  }
+  .tag{
+    font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:500;
+    padding:2px 7px; border-radius:20px; border:1px solid var(--line); color:var(--muted);
+    white-space:nowrap;
+  }
+  .tag.state{color:var(--accent); border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+
+  .legend{display:flex; flex-wrap:wrap; gap:8px 18px; margin:18px 2px 0; font-size:13px; color:var(--muted)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .sw{width:22px; height:0; border-top:2px solid currentColor; display:inline-block}
+  .sw.amber{border-color:var(--accent)} .sw.mut{border-top-style:dashed; border-color:var(--muted)}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  .foot{margin-top:40px; font-size:13px; color:var(--muted)}
+  .foot code{font-family:"IBM Plex Mono",monospace; background:var(--paper);
+    border:1px solid var(--line); border-radius:5px; padding:1px 5px}
+  a{color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ictlib · system schematic</p>
+    <h1>ICT concept-detection library</h1>
+    <p class="lede">A dependency-light Python engine that turns raw candles into the
+    building blocks of ICT price analysis. The <b>primitive layer detects; everything
+    downstream consumes</b> — a scanner, a chart, and (next) a backtester all read the
+    same <span class="mono">Analysis</span> snapshot instead of re-deriving it.</p>
+  </header>
+
+  <hr class="rule">
+
+  <!-- ============ FIGURE 1: PIPELINE ============ -->
+  <section>
+    <h2>Data flow</h2>
+    <figure>
+      <div class="panel scroll">
+        <svg class="fig" viewBox="0 0 960 640" role="img"
+             aria-label="Candles from OANDA or CSV flow into seven pure concept detectors, are aggregated by analyze() into one Analysis snapshot, which the scanner, visualiser, and a planned backtester all consume.">
+          <defs>
+            <marker id="ar" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7"
+                    markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+            <marker id="arAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7"
+                    markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+
+          <!-- row 1: data sources -->
+          <rect class="node" x="250" y="26" width="180" height="46" rx="9"/>
+          <text class="lbl big" x="340" y="54" text-anchor="middle">OANDA v20</text>
+          <rect class="node" x="530" y="26" width="180" height="46" rx="9"/>
+          <text class="lbl big" x="620" y="54" text-anchor="middle">CSV / offline</text>
+          <text class="etxt" x="480" y="18" text-anchor="middle">data sources</text>
+
+          <!-- arrows into candles -->
+          <path class="edge" marker-end="url(#ar)" d="M340,72 C340,96 440,96 458,116"/>
+          <path class="edge" marker-end="url(#ar)" d="M620,72 C620,96 520,96 502,116"/>
+          <text class="etxt" x="480" y="104" text-anchor="middle">fetch · parse → List[Candle]</text>
+
+          <!-- candle pill -->
+          <rect class="node" x="360" y="120" width="240" height="46" rx="23"/>
+          <text class="lbl big" x="480" y="148" text-anchor="middle">List[Candle]</text>
+
+          <!-- arrow to concepts -->
+          <path class="edge" marker-end="url(#ar)" d="M480,166 L480,206"/>
+          <text class="etxt" x="490" y="190" text-anchor="start">detect</text>
+
+          <!-- concepts container -->
+          <rect class="grp" x="110" y="212" width="740" height="150" rx="12"/>
+          <text class="lbl sm mut" x="128" y="234">concepts/ — pure primitives (stdlib only)</text>
+          <!-- 7 boxes -->
+          <g>
+            <rect class="node" x="128" y="270" width="94" height="70" rx="8"/>
+            <text class="lbl sm" x="175" y="300" text-anchor="middle">structure</text>
+            <text class="lbl sm mut" x="175" y="318" text-anchor="middle" font-size="10">swings·BOS</text>
+            <text class="lbl sm mut" x="175" y="331" text-anchor="middle" font-size="10">CHoCH·MSS</text>
+
+            <rect class="node" x="230" y="270" width="94" height="70" rx="8"/>
+            <text class="lbl sm" x="277" y="300" text-anchor="middle" font-size="11">displace-</text>
+            <text class="lbl sm" x="277" y="314" text-anchor="middle" font-size="11">ment</text>
+
+            <rect class="node" x="332" y="270" width="94" height="70" rx="8"/>
+            <text class="lbl sm" x="379" y="304" text-anchor="middle">fvg</text>
+
+            <rect class="node" x="434" y="270" width="106" height="70" rx="8"/>
+            <text class="lbl sm" x="487" y="300" text-anchor="middle" font-size="11">order_</text>
+            <text class="lbl sm" x="487" y="314" text-anchor="middle" font-size="11">blocks</text>
+
+            <rect class="node" x="548" y="270" width="94" height="70" rx="8"/>
+            <text class="lbl sm" x="595" y="304" text-anchor="middle">liquidity</text>
+
+            <rect class="node" x="650" y="270" width="94" height="70" rx="8"/>
+            <text class="lbl sm" x="697" y="304" text-anchor="middle">killzones</text>
+
+            <rect class="node" x="752" y="270" width="86" height="70" rx="8"/>
+            <text class="lbl sm" x="795" y="304" text-anchor="middle">ote</text>
+          </g>
+
+          <!-- arrow to analyze -->
+          <path class="edge" marker-end="url(#ar)" d="M480,362 L480,404"/>
+          <text class="etxt" x="490" y="388" text-anchor="start">aggregate</text>
+
+          <!-- analyze pill -->
+          <rect class="node" x="330" y="408" width="300" height="52" rx="12"/>
+          <text class="lbl big" x="480" y="434" text-anchor="middle">analyze()</text>
+          <text class="lbl sm mut" x="480" y="450" text-anchor="middle">→ Analysis snapshot</text>
+
+          <!-- fan to consumers -->
+          <path class="edge accent" marker-end="url(#arAmber)" d="M440,460 C400,486 300,486 262,506"/>
+          <path class="edge" marker-end="url(#ar)" d="M480,460 L480,506"/>
+          <path class="edge dash" marker-end="url(#ar)" d="M520,460 C560,486 680,486 720,506"/>
+          <text class="etxt" x="300" y="498" text-anchor="middle">consume</text>
+
+          <!-- consumers -->
+          <rect class="node accent" x="132" y="510" width="220" height="66" rx="10"/>
+          <text class="lbl big accent" x="242" y="540" text-anchor="middle">scan()</text>
+          <text class="lbl sm mut" x="242" y="560" text-anchor="middle">→ Signal (confluence)</text>
+
+          <rect class="node" x="372" y="510" width="220" height="66" rx="10"/>
+          <text class="lbl big" x="482" y="540" text-anchor="middle">viz.render_html()</text>
+          <text class="lbl sm mut" x="482" y="560" text-anchor="middle">→ annotated chart</text>
+
+          <rect class="node dash" x="612" y="510" width="220" height="66" rx="10"/>
+          <text class="lbl big mut" x="722" y="540" text-anchor="middle">backtester / bot</text>
+          <text class="lbl sm mut" x="722" y="560" text-anchor="middle">planned — same snapshot</text>
+        </svg>
+      </div>
+      <figcaption>Detection lives in <b>one place</b>. The seven concept modules read
+      only <span class="mono">List[Candle]</span> and never import each other's consumers,
+      so the scanner, the visualiser, and a future backtester all sit beside one another
+      on the same <span class="mono">Analysis</span> object — no primitive is ever computed twice.</figcaption>
+    </figure>
+    <div class="legend">
+      <span><i class="sw amber"></i> critical path — signal output</span>
+      <span><i class="sw"></i> data / detection flow</span>
+      <span><i class="sw mut"></i> planned</span>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ FIGURE 2: SETUP LOGIC ============ -->
+  <section>
+    <h2>The scanner setup — sweep → MSS → entry</h2>
+    <figure>
+      <div class="panel scroll">
+        <svg class="fig" viewBox="0 0 980 320" role="img"
+             aria-label="A liquidity sweep is followed by an opposite MSS, whose fair value gap or order block becomes the entry; the stop sits beyond the sweep extreme and targets are the opposite liquidity pools. Confluence scores the entry.">
+          <defs>
+            <marker id="ar2" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7"
+                    markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <!-- stage 1 -->
+          <rect class="node" x="20" y="60" width="188" height="76" rx="10"/>
+          <text class="lbl big" x="114" y="92" text-anchor="middle">1 · Liquidity sweep</text>
+          <text class="lbl sm mut" x="114" y="112" text-anchor="middle">wick runs a pool,</text>
+          <text class="lbl sm mut" x="114" y="126" text-anchor="middle">closes back inside</text>
+
+          <path class="edge" marker-end="url(#ar2)" d="M208,98 L256,98"/>
+          <text class="etxt" x="232" y="88" text-anchor="middle">traps</text>
+
+          <!-- stage 2 -->
+          <rect class="node" x="256" y="60" width="188" height="76" rx="10"/>
+          <text class="lbl big" x="350" y="92" text-anchor="middle">2 · MSS (opposite)</text>
+          <text class="lbl sm mut" x="350" y="112" text-anchor="middle">displaced CHoCH</text>
+          <text class="lbl sm mut" x="350" y="126" text-anchor="middle">that leaves an FVG</text>
+
+          <path class="edge" marker-end="url(#ar2)" d="M444,98 L492,98"/>
+          <text class="etxt" x="468" y="88" text-anchor="middle">leaves</text>
+
+          <!-- stage 3 (accent) -->
+          <rect class="node accent" x="492" y="60" width="188" height="76" rx="10"/>
+          <text class="lbl big accent" x="586" y="92" text-anchor="middle">3 · Entry zone</text>
+          <text class="lbl sm mut" x="586" y="112" text-anchor="middle">FVG consequent enc.</text>
+          <text class="lbl sm mut" x="586" y="126" text-anchor="middle">or OB mean threshold</text>
+
+          <!-- outputs -->
+          <path class="edge" marker-end="url(#ar2)" d="M680,80 C716,80 724,60 760,54"/>
+          <path class="edge" marker-end="url(#ar2)" d="M680,116 C716,116 724,140 760,146"/>
+          <rect class="node" x="760" y="30" width="200" height="48" rx="9"/>
+          <text class="lbl sm" x="860" y="50" text-anchor="middle">Stop</text>
+          <text class="lbl sm mut" x="860" y="66" text-anchor="middle">beyond sweep extreme</text>
+          <rect class="node" x="760" y="122" width="200" height="48" rx="9"/>
+          <text class="lbl sm" x="860" y="142" text-anchor="middle">Targets</text>
+          <text class="lbl sm mut" x="860" y="158" text-anchor="middle">draw on liquidity (pools)</text>
+
+          <!-- confluence -->
+          <rect class="grp" x="256" y="228" width="424" height="64" rx="10"/>
+          <text class="lbl sm mut" x="468" y="252" text-anchor="middle">confluence → score</text>
+          <text class="lbl sm" x="468" y="274" text-anchor="middle">killzone · HTF bias · OTE 0.62–0.79 · EQH/EQL swept</text>
+          <path class="edge" marker-end="url(#ar2)" d="M586,228 L586,138"/>
+          <text class="etxt" x="596" y="190" text-anchor="start">scores</text>
+        </svg>
+      </div>
+      <figcaption>The included <span class="mono">scan()</span> encodes the classic ICT
+      reversal. A <b>sweep</b> gathers stops; an <b>MSS</b> the other way is the reversal
+      signature; its <b>FVG/OB</b> is the entry. Stop and targets come straight from the
+      primitives, and the confluences that fired are attached to every signal as
+      <span class="mono">reasons</span>.</figcaption>
+    </figure>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ CONCEPT REFERENCE ============ -->
+  <section>
+    <h2>Primitive → rule (from the ICT knowledge library)</h2>
+    <div class="grid-cards">
+
+      <div class="card">
+        <div class="top"><h3>swing / structure</h3><span class="mod">structure.py</span></div>
+        <p>n-bar fractal pivots; a close beyond the last opposite swing is a break —
+        continuation (BOS) or first reversal (CHoCH).</p>
+        <code>H_n &gt; H_{n±1..w}</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>mss</h3><span class="mod">structure.py</span></div>
+        <p>The reversal-grade break: a CHoCH that carries displacement <em>and</em>
+        leaves a fair value gap in the breaking move.</p>
+        <code>CHoCH + displacement + FVG</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>displacement</h3><span class="mod">displacement.py</span></div>
+        <p>The filter that separates real PD arrays from noise — a wide, dominant,
+        one-directional candle.</p>
+        <code>body≥1.5×avg · body/range≥.70</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>fvg</h3><span class="mod">fvg.py</span> <span class="tag state">tracks mitigation</span></div>
+        <p>Three-candle imbalance; midpoint is the consequent-encroachment entry.
+        Marked mitigated once price rebalances it.</p>
+        <code>bull: L_{n+1} &gt; H_{n-1}</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>order_blocks</h3><span class="mod">order_blocks.py</span> <span class="tag state">tracks mitigation</span></div>
+        <p>Last opposite-colour candle before a structure-breaking displacement; its
+        body is the entry zone, midpoint the mean threshold.</p>
+        <code>last opposite → displacement → BOS</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>liquidity</h3><span class="mod">liquidity.py</span> <span class="tag state">tracks swept</span></div>
+        <p>BSL/SSL pools at swings, EQH/EQL clusters within tolerance, and the sweep
+        that runs them: wick through + close back + 60% wick.</p>
+        <code>high&gt;lvl · close&lt;lvl · wick≥.6</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>killzones</h3><span class="mod">killzones.py</span></div>
+        <p>NY-clock windows — Asia, London, NY AM/PM — plus silver-bullet and macro
+        sub-windows. DST-aware via the tz database.</p>
+        <code>America/New_York → window</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>ote</h3><span class="mod">ote.py</span></div>
+        <p>Optimal Trade Entry band on a measured leg; the 0.62–0.79 retracement is
+        the entry-depth confluence.</p>
+        <code>retrace ∈ [0.62, 0.79]</code>
+      </div>
+
+    </div>
+    <div class="legend">
+      <span><i class="dot bull"></i> bullish variant</span>
+      <span><i class="dot bear"></i> bearish variant</span>
+      <span><i class="tag state" style="padding:1px 7px">state</i> detector carries live mitigation / swept state</span>
+    </div>
+  </section>
+
+  <p class="foot">Grounded in the <a href="https://github.com/SrsBlack/ict-knowledge-library">ict-knowledge-library</a>
+  concept definitions. Run it: <code>python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv --html chart.html</code>
+  · Educational tool — not financial advice.</p>
+</div>
