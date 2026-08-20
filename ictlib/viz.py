@@ -53,11 +53,15 @@ def render_html(
     view = list(range(start, len(candles)))
 
     # ---- geometry -------------------------------------------------------- #
-    slot = 9.0
+    # Adaptive candle spacing: with few bars, widen the slots so the chart
+    # stays landscape and fits in one frame; with many bars, tighten toward a
+    # floor (the page caps height so the whole series fits vertically).
+    n_view = len(view)
+    slot = max(6.5, min(22.0, 1100.0 / max(n_view, 1)))
     mL, mR, mT, mB = 8.0, 78.0, 14.0, 30.0
-    plot_w = len(view) * slot
+    plot_w = n_view * slot
     W = plot_w + mL + mR
-    H = 600.0
+    H = 440.0
     plot_h = H - mT - mB
 
     lows = [candles[i].low for i in view]
@@ -328,7 +332,8 @@ _PAGE = """<!doctype html>
   .leg input {{ accent-color:#2962ff; }}
   .dot {{ width:11px; height:11px; border-radius:2px; display:inline-block; }}
   .wrap {{ overflow-x:auto; padding:0 10px 18px; }}
-  svg.chart {{ width:100%; min-width:760px; height:auto;
+  svg.chart {{ display:block; margin:0 auto; width:auto; height:auto;
+    max-width:100%; max-height:82vh;
     background:var(--panel); border:1px solid var(--border); border-radius:8px; }}
   .gridline {{ stroke:var(--line); stroke-width:0.6; }}
   text.axis {{ fill:var(--muted); font-size:9px; }}
