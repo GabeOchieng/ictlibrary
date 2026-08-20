@@ -136,6 +136,59 @@ def render_html(
                          f'fill="var(--muted)">{deg}</text>')
         parts.append('</g>')
 
+    # ---- session ranges -------------------------------------------------- #
+    if analysis.session_ranges:
+        parts.append('<g data-layer="sessions">')
+        for sr in analysis.session_ranges:
+            x1 = x_of(max(sr.start_index, start))
+            x2 = x_of(min(sr.end_index, len(candles) - 1))
+            yh, yl = y_of(sr.high), y_of(sr.low)
+            for yy in (yh, yl):
+                parts.append(f'<line x1="{x1:.1f}" y1="{yy:.1f}" x2="{x2:.1f}" '
+                             f'y2="{yy:.1f}" stroke="var(--muted)" stroke-width="0.8" '
+                             f'stroke-opacity="0.55" stroke-dasharray="2 2"/>')
+            parts.append(f'<text x="{x1+2:.1f}" y="{yh-2:.1f}" class="tag" '
+                         f'fill="var(--muted)">{html.escape(sr.name)}</text>')
+        parts.append('</g>')
+
+    # ---- Asian range + projections -------------------------------------- #
+    ar = analysis.asian_range
+    if ar is not None:
+        parts.append('<g data-layer="asian">')
+        x1 = x_of(max(ar.start_index, start))
+        yh, yl = y_of(ar.high), y_of(ar.low)
+        parts.append(f'<rect x="{x1:.1f}" y="{yh:.1f}" width="{right_edge()-x1:.1f}" '
+                     f'height="{max(yl-yh,1):.1f}" fill="{C_MSS}" fill-opacity="0.06" '
+                     f'stroke="{C_MSS}" stroke-opacity="0.6" stroke-dasharray="4 3"/>')
+        parts.append(f'<text x="{x1+2:.1f}" y="{yh-2:.1f}" class="tag" '
+                     f'fill="{C_MSS}">Asia</text>')
+        for name, price in ar.projections().items():
+            yy = y_of(price)
+            parts.append(f'<line x1="{x1:.1f}" y1="{yy:.1f}" x2="{right_edge():.1f}" '
+                         f'y2="{yy:.1f}" stroke="{C_MSS}" stroke-width="0.7" '
+                         f'stroke-opacity="0.4" stroke-dasharray="1 3"/>')
+            parts.append(f'<text x="{right_edge()+4:.1f}" y="{yy+3:.1f}" class="tag" '
+                         f'fill="{C_MSS}">{name}</text>')
+        parts.append('</g>')
+
+    # ---- IPDA lookback levels ------------------------------------------- #
+    if analysis.ipda and analysis.ipda.levels:
+        parts.append('<g data-layer="ipda">')
+        seen = set()
+        for key, price in analysis.ipda.levels.items():
+            r = round(price, 6)
+            if r in seen:
+                continue
+            seen.add(r)
+            yy = y_of(price)
+            parts.append(f'<line x1="{mL:.1f}" y1="{yy:.1f}" x2="{right_edge():.1f}" '
+                         f'y2="{yy:.1f}" stroke="{C_OB_BEAR}" stroke-width="0.8" '
+                         f'stroke-opacity="0.5" stroke-dasharray="6 4"/>')
+            # offset from the left edge so it clears the dealing-range degree labels
+            parts.append(f'<text x="{mL+64:.1f}" y="{yy-2:.1f}" class="tag" '
+                         f'fill="{C_OB_BEAR}">IPDA {html.escape(key)}</text>')
+        parts.append('</g>')
+
     # ---- liquidity pools (draw first, behind candles) ------------------- #
     parts.append('<g data-layer="pools">')
     for p in analysis.pools:
@@ -339,6 +392,9 @@ def render_html(
         ("breakers", "Breakers", C_BULL),
         ("rejection", "Rejection Blocks", C_BEAR),
         ("vi", "Volume Imbalance", C_BULL),
+        ("sessions", "Session Ranges", "var(--muted)"),
+        ("asian", "Asian Range", C_MSS),
+        ("ipda", "IPDA Levels", C_OB_BEAR),
         ("pools", "Liquidity Pools", C_BEAR),
         ("sweeps", "Sweeps", C_SWEEP),
         ("signals", "Signals", C_ENTRY),

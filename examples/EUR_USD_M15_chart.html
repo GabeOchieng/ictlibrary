@@ -51,7 +51,7 @@
   <div class="sub"><b>EUR_USD</b> · M15 · bias <b>bullish</b> · price <b>premium</b> · killzone <b>London Close</b> · 23 bars</div>
   <div class="stats">2 structure · 0/4 FVG open · 1/2 OB open · 2 sweeps · 1 signals</div>
 </header>
-<div class="legend"><label class="leg"><input type="checkbox" checked data-toggle="candles"><span class="dot" style="background:var(--fg)"></span>Candles</label><label class="leg"><input type="checkbox" checked data-toggle="pd"><span class="dot" style="background:#ffca28"></span>Premium / Discount</label><label class="leg"><input type="checkbox" checked data-toggle="swings"><span class="dot" style="background:#26a69a"></span>Swings</label><label class="leg"><input type="checkbox" checked data-toggle="structure"><span class="dot" style="background:#ffca28"></span>BOS / CHoCH / MSS</label><label class="leg"><input type="checkbox" checked data-toggle="fvg"><span class="dot" style="background:#26a69a"></span>Fair Value Gaps</label><label class="leg"><input type="checkbox" checked data-toggle="ob"><span class="dot" style="background:#2962ff"></span>Order Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="breakers"><span class="dot" style="background:#26a69a"></span>Breakers</label><label class="leg"><input type="checkbox" checked data-toggle="rejection"><span class="dot" style="background:#ef5350"></span>Rejection Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="vi"><span class="dot" style="background:#26a69a"></span>Volume Imbalance</label><label class="leg"><input type="checkbox" checked data-toggle="pools"><span class="dot" style="background:#ef5350"></span>Liquidity Pools</label><label class="leg"><input type="checkbox" checked data-toggle="sweeps"><span class="dot" style="background:#ab47bc"></span>Sweeps</label><label class="leg"><input type="checkbox" checked data-toggle="signals"><span class="dot" style="background:#ffca28"></span>Signals</label></div>
+<div class="legend"><label class="leg"><input type="checkbox" checked data-toggle="candles"><span class="dot" style="background:var(--fg)"></span>Candles</label><label class="leg"><input type="checkbox" checked data-toggle="pd"><span class="dot" style="background:#ffca28"></span>Premium / Discount</label><label class="leg"><input type="checkbox" checked data-toggle="swings"><span class="dot" style="background:#26a69a"></span>Swings</label><label class="leg"><input type="checkbox" checked data-toggle="structure"><span class="dot" style="background:#ffca28"></span>BOS / CHoCH / MSS</label><label class="leg"><input type="checkbox" checked data-toggle="fvg"><span class="dot" style="background:#26a69a"></span>Fair Value Gaps</label><label class="leg"><input type="checkbox" checked data-toggle="ob"><span class="dot" style="background:#2962ff"></span>Order Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="breakers"><span class="dot" style="background:#26a69a"></span>Breakers</label><label class="leg"><input type="checkbox" checked data-toggle="rejection"><span class="dot" style="background:#ef5350"></span>Rejection Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="vi"><span class="dot" style="background:#26a69a"></span>Volume Imbalance</label><label class="leg"><input type="checkbox" checked data-toggle="sessions"><span class="dot" style="background:var(--muted)"></span>Session Ranges</label><label class="leg"><input type="checkbox" checked data-toggle="asian"><span class="dot" style="background:#ffca28"></span>Asian Range</label><label class="leg"><input type="checkbox" checked data-toggle="ipda"><span class="dot" style="background:#ff9800"></span>IPDA Levels</label><label class="leg"><input type="checkbox" checked data-toggle="pools"><span class="dot" style="background:#ef5350"></span>Liquidity Pools</label><label class="leg"><input type="checkbox" checked data-toggle="sweeps"><span class="dot" style="background:#ab47bc"></span>Sweeps</label><label class="leg"><input type="checkbox" checked data-toggle="signals"><span class="dot" style="background:#ffca28"></span>Signals</label></div>
 <div class="wrap"><svg viewBox="0 0 592 440" preserveAspectRatio="xMinYMid meet" class="chart" role="img" aria-label="ICT Concept Map — EUR_USD">
 <g class="grid">
 <line x1="8.0" y1="410.0" x2="514.0" y2="410.0" class="gridline"/>
@@ -86,6 +86,23 @@
 <text x="11.0" y="32.2" class="tag" fill="var(--muted)">STH</text>
 <line x1="8.0" y1="380.6" x2="514.0" y2="380.6" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.6"/>
 <text x="11.0" y="377.6" class="tag" fill="var(--muted)">STL</text>
+</g>
+<g data-layer="sessions">
+<line x1="19.0" y1="68.1" x2="437.0" y2="68.1" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<line x1="19.0" y1="380.6" x2="437.0" y2="380.6" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<text x="21.0" y="66.1" class="tag" fill="var(--muted)">London</text>
+<line x1="195.0" y1="35.2" x2="503.0" y2="35.2" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<line x1="195.0" y1="380.6" x2="503.0" y2="380.6" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<text x="197.0" y="33.2" class="tag" fill="var(--muted)">NY AM</text>
+<line x1="371.0" y1="35.2" x2="503.0" y2="35.2" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<line x1="371.0" y1="232.6" x2="503.0" y2="232.6" stroke="var(--muted)" stroke-width="0.8" stroke-opacity="0.55" stroke-dasharray="2 2"/>
+<text x="373.0" y="33.2" class="tag" fill="var(--muted)">London Close</text>
+</g>
+<g data-layer="ipda">
+<line x1="8.0" y1="35.2" x2="514.0" y2="35.2" stroke="#ff9800" stroke-width="0.8" stroke-opacity="0.5" stroke-dasharray="6 4"/>
+<text x="72.0" y="33.2" class="tag" fill="#ff9800">IPDA 20_high</text>
+<line x1="8.0" y1="380.6" x2="514.0" y2="380.6" stroke="#ff9800" stroke-width="0.8" stroke-opacity="0.5" stroke-dasharray="6 4"/>
+<text x="72.0" y="378.6" class="tag" fill="#ff9800">IPDA 20_low</text>
 </g>
 <g data-layer="pools">
 <line class="pool swept" x1="217.0" y1="331.2" x2="514.0" y2="331.2" stroke="#26a69a" stroke-width="0.9" stroke-dasharray="4 3"/>
@@ -189,7 +206,8 @@
 <line x1="349.0" y1="296.3" x2="514.0" y2="296.3" stroke="#ffca28" stroke-width="1.1" stroke-dasharray="5 3"/>
 <line x1="349.0" y1="388.8" x2="514.0" y2="388.8" stroke="#ef5350" stroke-width="1.1" stroke-dasharray="5 3"/>
 <line x1="349.0" y1="257.2" x2="514.0" y2="257.2" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
-<line x1="349.0" y1="35.2" x2="514.0" y2="35.2" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
+<line x1="349.0" y1="84.5" x2="514.0" y2="84.5" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
+<line x1="349.0" y1="68.1" x2="514.0" y2="68.1" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
 <text x="352.0" y="291.2" class="sig" fill="#ffca28">▲ LONG score 6</text>
 </g>
 </svg></div>

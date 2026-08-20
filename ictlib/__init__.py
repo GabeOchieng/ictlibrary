@@ -22,18 +22,20 @@ Quick start
 
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
-    DealingRange, Breaker, RejectionBlock, VolumeImbalance, Signal, to_jsonable,
+    DealingRange, Breaker, RejectionBlock, VolumeImbalance,
+    SessionRange, AsianRange, IPDALevels, Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
 from . import concepts
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
     "LiquidityPool", "Sweep", "DealingRange", "Breaker", "RejectionBlock",
-    "VolumeImbalance", "Signal", "to_jsonable",
+    "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
+    "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "__version__",
 ]

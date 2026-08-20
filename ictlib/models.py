@@ -309,6 +309,69 @@ class LiquidityPool:
     swept_index: Optional[int] = None
 
 
+@dataclass
+class SessionRange:
+    """The high/low of a trading session's most recent occurrence
+    (concepts/15-sessions). Session bounds are resting liquidity pools."""
+
+    name: str
+    high: float
+    low: float
+    high_index: int
+    low_index: int
+    start_index: int
+    end_index: int
+
+    @property
+    def eq(self) -> float:
+        return (self.high + self.low) / 2.0
+
+    @property
+    def size(self) -> float:
+        return self.high - self.low
+
+
+@dataclass
+class AsianRange:
+    """The Asia-session range and its extension targets
+    (concepts/14-asian-range). London/NY delivery typically sweeps one bound
+    (the Judas swing) then expands toward multiples of the range size."""
+
+    high: float
+    low: float
+    high_index: int
+    low_index: int
+    start_index: int
+    end_index: int
+    swept_side: Optional[str] = None   # "high" | "low" | None
+
+    @property
+    def eq(self) -> float:
+        return (self.high + self.low) / 2.0
+
+    @property
+    def size(self) -> float:
+        return self.high - self.low
+
+    def projections(self, multiples=(0.5, 1.0, 1.5, 2.0)) -> dict:
+        """Extension targets above (from high) and below (from low)."""
+        out = {}
+        for m in multiples:
+            out[f"up_{m}x"] = self.high + m * self.size
+            out[f"down_{m}x"] = self.low - m * self.size
+        return out
+
+
+@dataclass
+class IPDALevels:
+    """IPDA 20/40/60-day lookback reference highs/lows
+    (concepts/23-ipda). The untaken extremes price is drawn toward."""
+
+    levels: dict           # {"20_high": price, "20_low": price, ...}
+    days_used: int
+    lookbacks: tuple = (20, 40, 60)
+
+
 @dataclass(frozen=True)
 class Sweep:
     """Liquidity sweep / raid (concepts/02-liquidity/liquidity-sweep).

@@ -14,12 +14,14 @@ from typing import List, Optional
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
+    SessionRange, AsianRange, IPDALevels,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
     find_fvgs, find_order_blocks, find_pools, find_sweeps, infer_pip_size,
     active_killzone, find_dealing_range,
     find_breakers, find_rejection_blocks, find_volume_imbalances,
+    all_session_ranges, asian_range, ipda_levels,
 )
 
 
@@ -36,6 +38,9 @@ class Analysis:
     breakers: List[Breaker] = field(default_factory=list)
     rejection_blocks: List[RejectionBlock] = field(default_factory=list)
     volume_imbalances: List[VolumeImbalance] = field(default_factory=list)
+    session_ranges: List[SessionRange] = field(default_factory=list)
+    asian_range: Optional[AsianRange] = None
+    ipda: Optional[IPDALevels] = None
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -52,6 +57,26 @@ class Analysis:
     @property
     def open_pools(self) -> List[LiquidityPool]:
         return [p for p in self.pools if not p.swept]
+
+    def draw_on_liquidity(self, side: str) -> List[float]:
+        """The IPDA reference set of draw-on-liquidity levels on one side:
+        pool prices + session/Asian-range extremes + IPDA lookback levels.
+
+        ``side`` "up" returns levels above (long targets / BSL), "down" below.
+        """
+        levels: List[float] = []
+        want_high = side == "up"
+        for p in self.pools:
+            if (p.kind == "BSL") == want_high:
+                levels.append(p.price)
+        for sr in self.session_ranges:
+            levels.append(sr.high if want_high else sr.low)
+        if self.asian_range is not None:
+            levels.append(self.asian_range.high if want_high else self.asian_range.low)
+        if self.ipda is not None:
+            key = "high" if want_high else "low"
+            levels += [v for k, v in self.ipda.levels.items() if k.endswith(key)]
+        return sorted(set(levels), reverse=not want_high)
 
     @property
     def price_state(self) -> Optional[str]:
@@ -79,6 +104,9 @@ class Analysis:
             "breakers": len(self.breakers),
             "rejection_blocks": len(self.rejection_blocks),
             "volume_imbalances": len(self.volume_imbalances),
+            "session_ranges": len(self.session_ranges),
+            "asian_range": bool(self.asian_range),
+            "ipda_days": self.ipda.days_used if self.ipda else 0,
         }
 
 
@@ -105,6 +133,9 @@ def analyze(
     key_levels = [s.price for s in swings] + [p.price for p in pools]
     rbs = find_rejection_blocks(candles, key_levels=key_levels, tol=3 * pip)
     vis = find_volume_imbalances(candles, min_size=pip)
+    sessions = all_session_ranges(candles)
+    asia = asian_range(candles, anchor="kz")
+    ipda = ipda_levels(candles)
 
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
@@ -131,6 +162,9 @@ def analyze(
         breakers=breakers,
         rejection_blocks=rbs,
         volume_imbalances=vis,
+        session_ranges=sessions,
+        asian_range=asia,
+        ipda=ipda,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

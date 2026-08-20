@@ -128,16 +128,16 @@ def _ob_for_event(analysis, event_index):
 
 
 def _draw_on_liquidity(analysis, kind, entry, *, limit: int = 3) -> List[float]:
-    """Opposite-side pools in the trade direction — the draw on liquidity.
+    """The IPDA draw-on-liquidity set in the trade direction — pools plus
+    session/Asian-range extremes and IPDA lookback levels (analysis.draw_on_liquidity).
 
-    Returns up to ``limit`` targets, nearest first (T1 = nearest pool, then the
-    next pools out toward the major old high/low)."""
-    candidates = [p for p in analysis.pools if p.kind == kind and not p.swept]
-    if kind == "BSL":  # long targets: pools above entry, ascending
-        levels = sorted(p.price for p in candidates if p.price > entry)
-    else:              # short targets: pools below entry, descending
-        levels = sorted((p.price for p in candidates if p.price < entry),
-                        reverse=True)
+    Returns up to ``limit`` targets, nearest first."""
+    side = "up" if kind == "BSL" else "down"
+    all_levels = analysis.draw_on_liquidity(side)
+    if kind == "BSL":  # long targets: levels above entry, ascending
+        levels = sorted(lv for lv in all_levels if lv > entry)
+    else:              # short targets: levels below entry, descending
+        levels = sorted((lv for lv in all_levels if lv < entry), reverse=True)
     return levels[:limit]
 
 
