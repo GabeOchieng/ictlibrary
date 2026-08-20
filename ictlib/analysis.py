@@ -15,7 +15,7 @@ from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
-    TurtleSoup, CRTSetup, QuarterlyContext,
+    TurtleSoup, CRTSetup, QuarterlyContext, MTFContext,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -46,6 +46,7 @@ class Analysis:
     turtle_soups: List[TurtleSoup] = field(default_factory=list)
     crt_setups: List[CRTSetup] = field(default_factory=list)
     quarterly: Optional[QuarterlyContext] = None
+    mtf: Optional[MTFContext] = None
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -116,6 +117,8 @@ class Analysis:
             "crt_setups": len(self.crt_setups),
             "quarter": self.quarterly.daily_quarter if self.quarterly else None,
             "phase": self.quarterly.phase if self.quarterly else None,
+            "htf_bias": self.mtf.bias if self.mtf else None,
+            "htf_reads": [(r.label, r.bias) for r in self.mtf.reads] if self.mtf else [],
         }
 
 
@@ -125,8 +128,13 @@ def analyze(
     swing_width: int = 2,
     pip: Optional[float] = None,
     eq_tolerance_pips: float = 5.0,
+    htf_timeframes: Optional[List[int]] = None,
 ) -> Analysis:
-    """Run the full primitive stack over ``candles``."""
+    """Run the full primitive stack over ``candles``.
+
+    ``htf_timeframes`` (minutes, e.g. ``[60, 240]``) enables the multi-timeframe
+    top-down HTF bias read (concepts/25-htf-bias).
+    """
     if pip is None:
         pip = infer_pip_size(candles)
 
@@ -148,6 +156,11 @@ def analyze(
     turtles = find_turtle_soups(candles, sweeps)
     crt = find_crt_setups(candles)
     quarterly = quarterly_context(candles)
+
+    mtf = None
+    if htf_timeframes:
+        from .mtf import multi_timeframe_bias
+        mtf = multi_timeframe_bias(candles, htf_timeframes)
 
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
@@ -180,6 +193,7 @@ def analyze(
         turtle_soups=turtles,
         crt_setups=crt,
         quarterly=quarterly,
+        mtf=mtf,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

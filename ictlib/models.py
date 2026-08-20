@@ -419,6 +419,32 @@ class QuarterlyContext:
     price_vs_tdo: Optional[str] = None     # premium | discount | at
 
 
+@dataclass
+class TFRead:
+    """One timeframe's bias read in a top-down stack (concepts/25-htf-bias)."""
+
+    label: str          # "H1", "H4", "D", ...
+    minutes: int
+    bias: str           # "bullish" | "bearish" | "neutral"
+    eq_side: Optional[str] = None   # premium | discount | equilibrium
+    candles: int = 0
+
+
+@dataclass
+class MTFContext:
+    """Aggregated multi-timeframe (top-down) HTF bias
+    (concepts/25-htf-bias/top-down-analysis)."""
+
+    reads: list = field(default_factory=list)   # list[TFRead], highest TF first
+    bias: str = "neutral"                        # aggregate bias
+    conflict: bool = False
+    entry_minutes: int = 0
+
+    def aligned(self, direction: str) -> bool:
+        want = "bullish" if direction == "long" else "bearish"
+        return self.bias == want
+
+
 @dataclass(frozen=True)
 class Sweep:
     """Liquidity sweep / raid (concepts/02-liquidity/liquidity-sweep).

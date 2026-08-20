@@ -27,21 +27,44 @@ from .analysis import analyze
 from .scanner import scan
 
 
+_TF_MIN = {"M1": 1, "M5": 5, "M15": 15, "M30": 30, "H1": 60, "H4": 240,
+           "D": 1440, "W": 10080}
+
+
 def _load(args) -> List[Candle]:
     if args.oanda:
         from .data import OandaClient
         client = OandaClient(api_key=args.api_key, env=args.env)
         return client.get_candles(args.instrument, args.granularity, args.count)
+    if args.alpaca:
+        from .data import AlpacaClient
+        client = AlpacaClient(feed=args.alpaca_feed)
+        return client.get_candles(args.instrument, args.granularity, args.count,
+                                  asset=args.asset)
     if args.csv:
         from .data import load_csv
         return load_csv(args.csv)
-    raise SystemExit("Provide --csv PATH or --oanda")
+    raise SystemExit("Provide --csv PATH, --oanda, or --alpaca")
+
+
+def _htf_minutes(spec: str) -> List[int]:
+    out = []
+    for tok in spec.split(","):
+        tok = tok.strip()
+        if not tok:
+            continue
+        key = tok.upper()
+        out.append(_TF_MIN[key] if key in _TF_MIN else int(tok))
+    return out
 
 
 def _print_report(analysis, signals, instrument, granularity) -> None:
     su = analysis.summary()
     print(f"\n=== ICT scan: {instrument or 'series'} {granularity} ===")
     print(f"bias={su['bias']}  killzone={su['killzone'] or '-'}  bars={su['candles']}")
+    if su.get("htf_bias"):
+        reads = " ".join(f"{lbl}:{b}" for lbl, b in su["htf_reads"])
+        print(f"HTF bias={su['htf_bias']}  ({reads})")
     print(f"structure={su['structure_events']}  "
           f"FVG={su['unmitigated_fvgs']}/{su['fvgs']} open  "
           f"OB={su['unmitigated_obs']}/{su['order_blocks']} open  "
@@ -67,7 +90,12 @@ def build_parser() -> argparse.ArgumentParser:
     src = p.add_argument_group("data source")
     src.add_argument("--csv", help="path to an OHLCV CSV file")
     src.add_argument("--oanda", action="store_true", help="pull from OANDA v20")
-    src.add_argument("--instrument", default="EUR_USD")
+    src.add_argument("--alpaca", action="store_true", help="pull from Alpaca market data")
+    src.add_argument("--asset", default="stocks", choices=["stocks", "crypto"],
+                     help="Alpaca asset class")
+    src.add_argument("--alpaca-feed", default=None, help="iex|sip (or ALPACA_FEED)")
+    src.add_argument("--instrument", default="EUR_USD",
+                     help="symbol: EUR_USD (OANDA), AAPL or BTC/USD (Alpaca)")
     src.add_argument("--granularity", default="M15")
     src.add_argument("--count", type=int, default=300)
     src.add_argument("--api-key", default=None, help="OANDA token (or OANDA_API_KEY)")
@@ -76,6 +104,10 @@ def build_parser() -> argparse.ArgumentParser:
     cfg = p.add_argument_group("detection")
     cfg.add_argument("--swing-width", type=int, default=2)
     cfg.add_argument("--min-score", type=int, default=2)
+    cfg.add_argument("--htf", default=None,
+                     help="higher timeframes for HTF bias, e.g. 'H1,H4'")
+    cfg.add_argument("--require-htf", action="store_true",
+                     help="drop signals that conflict with the HTF bias")
 
     bt = p.add_argument_group("backtest")
     bt.add_argument("--backtest", action="store_true", help="run the walk-forward backtester")
@@ -120,8 +152,10 @@ def main(argv=None) -> int:
             print(f"equity chart -> {args.equity_html}")
         return 0
 
-    analysis = analyze(candles, swing_width=args.swing_width)
-    signals = scan(analysis, min_score=args.min_score)
+    htf = _htf_minutes(args.htf) if args.htf else None
+    analysis = analyze(candles, swing_width=args.swing_width, htf_timeframes=htf)
+    signals = scan(analysis, min_score=args.min_score,
+                   require_htf_alignment=args.require_htf)
 
     if args.json:
         print(json.dumps({

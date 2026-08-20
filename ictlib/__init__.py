@@ -24,23 +24,27 @@ from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
-    TurtleSoup, CRTSetup, QuarterlyContext, Signal, to_jsonable,
+    TurtleSoup, CRTSetup, QuarterlyContext, TFRead, MTFContext,
+    Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
 from .risk import RiskParams, position_size, r_multiple, size_signal
 from .backtest import backtest, BacktestResult, Trade
+from .mtf import multi_timeframe_bias, resample_tf
 from . import concepts
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
     "LiquidityPool", "Sweep", "DealingRange", "Breaker", "RejectionBlock",
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
-    "TurtleSoup", "CRTSetup", "QuarterlyContext", "Signal", "to_jsonable",
+    "TurtleSoup", "CRTSetup", "QuarterlyContext", "TFRead", "MTFContext",
+    "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "RiskParams", "position_size", "r_multiple", "size_signal",
     "backtest", "BacktestResult", "Trade",
+    "multi_timeframe_bias", "resample_tf",
     "__version__",
 ]

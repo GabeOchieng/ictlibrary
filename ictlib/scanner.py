@@ -29,8 +29,14 @@ def scan(
     *,
     mss_window: int = 12,
     min_score: int = 2,
+    require_htf_alignment: bool = False,
 ) -> List[Signal]:
-    """Produce signals from a completed :class:`Analysis`."""
+    """Produce signals from a completed :class:`Analysis`.
+
+    ``require_htf_alignment`` drops signals whose direction conflicts with the
+    multi-timeframe HTF bias (only applies when the analysis carries an ``mtf``
+    context — see ``analyze(..., htf_timeframes=...)``).
+    """
     signals: List[Signal] = []
     candles = analysis.candles
 
@@ -67,6 +73,10 @@ def scan(
                 entry = entry_ob.mt
             stop = sweep.extreme + 2 * analysis.pip
             targets = _draw_on_liquidity(analysis, "SSL", entry)
+        if require_htf_alignment and analysis.mtf is not None:
+            if analysis.mtf.bias != "neutral" and not analysis.mtf.aligned(direction):
+                continue
+
         reasons, score = _score(analysis, sweep, mss, entry_fvg, entry_ob,
                                 direction, entry)
 
@@ -217,5 +227,16 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
         if q.price_vs_tdo == want_tdo:
             reasons.append(f"intraday {want_tdo} vs TDO {q.tdo:.5f}")
             score += 1
+
+    # Multi-timeframe HTF bias (top-down). Aligned adds conviction; a conflict
+    # against a clear HTF bias is flagged.
+    mtf = analysis.mtf
+    if mtf is not None and mtf.bias != "neutral":
+        stack = "+".join(r.label for r in mtf.reads) or "HTF"
+        if mtf.aligned(direction):
+            reasons.append(f"HTF bias {mtf.bias} aligned ({stack})")
+            score += 1
+        else:
+            reasons.append(f"⚠ against HTF bias {mtf.bias} ({stack})")
 
     return reasons, score
