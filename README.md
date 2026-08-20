@@ -241,6 +241,6 @@ tests/                 22 deterministic tests
 - [x] **PD-array variants** — inversion FVG, BPR, nested FVG, propulsion block, liquidity void.
 - [x] **SMT divergence + intermarket (DXY) + news blackout** — the data-dependent trio.
 - [x] **Reward:risk** — SD-projection targets + structural-stop mode (configurable).
-- [ ] Refinements: fib body-anchoring, stop-run-into-PD variants, mitigation partial/full,
-      more named models (Diamond, Venom, Zircon).
-- [ ] Live/paper execution adapter.
+- [x] **Refinements** — fib body-anchoring, mitigation lifecycle, stop-run variants,
+      90-min cycle, reclaimed OBs, Diamond + Venom models.
+- [ ] Live/paper execution adapter. (Zircon model omitted — demo-stage, unconfirmed.)
