@@ -77,6 +77,13 @@ def build_parser() -> argparse.ArgumentParser:
     cfg.add_argument("--swing-width", type=int, default=2)
     cfg.add_argument("--min-score", type=int, default=2)
 
+    bt = p.add_argument_group("backtest")
+    bt.add_argument("--backtest", action="store_true", help="run the walk-forward backtester")
+    bt.add_argument("--risk-pct", type=float, default=0.01, help="risk per trade (0.01 = 1%%)")
+    bt.add_argument("--equity", type=float, default=10_000.0)
+    bt.add_argument("--entry-mode", default="limit", choices=["limit", "market"])
+    bt.add_argument("--equity-html", help="write the equity curve to this HTML path")
+
     out = p.add_argument_group("output")
     out.add_argument("--html", help="write annotated chart to this HTML path")
     out.add_argument("--json", action="store_true", help="emit JSON to stdout")
@@ -89,6 +96,29 @@ def main(argv=None) -> int:
     if not candles:
         print("no candles loaded", file=sys.stderr)
         return 1
+
+    if args.backtest:
+        from .backtest import backtest
+        from .risk import RiskParams
+        res = backtest(candles, instrument=args.instrument,
+                       risk=RiskParams(equity=args.equity, risk_pct=args.risk_pct),
+                       min_score=args.min_score, entry_mode=args.entry_mode)
+        st = res.stats()
+        print(f"\n=== Backtest: {args.instrument} {args.granularity} "
+              f"({args.entry_mode} entry) ===")
+        if st.get("trades", 0):
+            print(f"trades={st['trades']}  win_rate={st['win_rate']*100:.0f}%  "
+                  f"total={st['total_r']:+.2f}R  expectancy={st['expectancy_r']:+.2f}R  "
+                  f"PF={st['profit_factor']}  maxDD={st['max_drawdown_r']:.2f}R")
+            print(f"equity (R): {res.equity_curve}")
+        else:
+            print("no closed trades")
+        if args.equity_html:
+            from .viz import render_equity_html
+            render_equity_html(res, args.equity_html,
+                               title=f"Backtest — {args.instrument} {args.granularity}")
+            print(f"equity chart -> {args.equity_html}")
+        return 0
 
     analysis = analyze(candles, swing_width=args.swing_width)
     signals = scan(analysis, min_score=args.min_score)

@@ -434,6 +434,120 @@ def render_html(
     return path
 
 
+def render_equity_html(result, path: str, *, title: str = "Backtest Equity") -> str:
+    """Render a backtest equity curve (cumulative R) to a standalone HTML file."""
+    curve = result.equity_curve
+    stats = result.stats()
+    if not curve:
+        curve = [0.0]
+
+    W, H = 900.0, 380.0
+    mL, mR, mT, mB = 54.0, 20.0, 20.0, 34.0
+    pw, ph = W - mL - mR, H - mT - mB
+    n = len(curve)
+    ymin = min(0.0, min(curve))
+    ymax = max(0.0, max(curve))
+    if ymax == ymin:
+        ymax += 1.0
+
+    def x_of(i):
+        return mL + (i / max(n - 1, 1)) * pw
+
+    def y_of(v):
+        return mT + (ymax - v) / (ymax - ymin) * ph
+
+    parts = [f'<svg viewBox="0 0 {W:.0f} {H:.0f}" class="chart" role="img" '
+             f'aria-label="{html.escape(title)} equity curve">']
+    # gridlines
+    for k in range(5):
+        v = ymin + (ymax - ymin) * k / 4
+        y = y_of(v)
+        parts.append(f'<line x1="{mL}" y1="{y:.1f}" x2="{mL+pw:.1f}" y2="{y:.1f}" '
+                     f'class="gridline"/>')
+        parts.append(f'<text x="{mL-6:.1f}" y="{y+3:.1f}" class="axis" '
+                     f'text-anchor="end">{v:.1f}R</text>')
+    # zero baseline
+    y0 = y_of(0.0)
+    parts.append(f'<line x1="{mL}" y1="{y0:.1f}" x2="{mL+pw:.1f}" y2="{y0:.1f}" '
+                 f'stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"/>')
+    # area + line
+    pts = " ".join(f"{x_of(i):.1f},{y_of(v):.1f}" for i, v in enumerate(curve))
+    up = curve[-1] >= 0
+    col = C_BULL if up else C_BEAR
+    parts.append(f'<polyline points="{mL:.1f},{y0:.1f} {pts} {x_of(n-1):.1f},{y0:.1f}" '
+                 f'fill="{col}" fill-opacity="0.10" stroke="none"/>')
+    parts.append(f'<polyline points="{pts}" fill="none" stroke="{col}" '
+                 f'stroke-width="2"/>')
+    for i, v in enumerate(curve):
+        parts.append(f'<circle cx="{x_of(i):.1f}" cy="{y_of(v):.1f}" r="2.6" '
+                     f'fill="{col}"><title>trade {i+1}: {v:.2f}R cumulative</title></circle>')
+    parts.append(f'<text x="{x_of(n-1):.1f}" y="{y_of(curve[-1])-8:.1f}" '
+                 f'class="sig" fill="{col}" text-anchor="end">{curve[-1]:.2f}R</text>')
+    parts.append('</svg>')
+
+    def stat(label, value):
+        return (f'<div class="stat"><div class="v">{value}</div>'
+                f'<div class="k">{label}</div></div>')
+
+    if stats.get("trades", 0):
+        cards = "".join([
+            stat("trades", stats["trades"]),
+            stat("win rate", f'{stats["win_rate"]*100:.0f}%'),
+            stat("total", f'{stats["total_r"]:+.2f}R'),
+            stat("expectancy", f'{stats["expectancy_r"]:+.2f}R'),
+            stat("profit factor", stats["profit_factor"]),
+            stat("max DD", f'{stats["max_drawdown_r"]:.2f}R'),
+        ])
+    else:
+        cards = stat("trades", 0)
+
+    doc = _EQUITY_PAGE.format(title=html.escape(title), cards=cards,
+                             svg="\n".join(parts))
+    with open(path, "w") as fh:
+        fh.write(doc)
+    return path
+
+
+_EQUITY_PAGE = """<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<style>
+  :root {{ --bg:#f7f8fa; --panel:#fff; --fg:#1a2027; --muted:#5b6672;
+    --line:#e3e7ec; --border:#d7dde3; }}
+  @media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{
+    --bg:#0e1116; --panel:#161b22; --fg:#e6edf3; --muted:#8b949e;
+    --line:#222c37; --border:#2a333d; }} }}
+  :root[data-theme="dark"] {{ --bg:#0e1116; --panel:#161b22; --fg:#e6edf3;
+    --muted:#8b949e; --line:#222c37; --border:#2a333d; }}
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; background:var(--bg); color:var(--fg);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }}
+  .wrap {{ max-width:940px; margin:0 auto; padding:22px 18px 32px; }}
+  h1 {{ font-size:16px; margin:0 0 14px; font-weight:600; }}
+  .stats {{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }}
+  .stat {{ background:var(--panel); border:1px solid var(--border);
+    border-radius:9px; padding:10px 14px; min-width:92px; }}
+  .stat .v {{ font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; }}
+  .stat .k {{ font-size:11px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.06em; margin-top:2px; }}
+  svg.chart {{ width:100%; height:auto; background:var(--panel);
+    border:1px solid var(--border); border-radius:10px; }}
+  .gridline {{ stroke:var(--line); stroke-width:0.6; }}
+  text.axis {{ fill:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; }}
+  text.sig {{ font-size:13px; font-weight:700; }}
+  footer {{ color:var(--muted); font-size:11px; margin-top:14px; }}
+</style></head><body>
+<div class="wrap">
+  <h1>{title}</h1>
+  <div class="stats">{cards}</div>
+  {svg}
+  <footer>Cumulative R across closed trades. Walk-forward, no lookahead.
+  Educational — not financial advice.</footer>
+</div></body></html>
+"""
+
+
 _PAGE = """<!doctype html>
 <html lang="en">
 <head>

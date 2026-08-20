@@ -11,5 +11,7 @@ venv/
 .mypy_cache/
 .DS_Store
 
-# generated preview images (kept: the sample CSV and the example HTML chart)
+# generated preview images (kept: the sample CSVs and the example HTML charts)
 examples/chart_preview.png
+examples/equity_preview.png
+examples/schematic_check.png

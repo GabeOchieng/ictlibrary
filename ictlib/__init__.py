@@ -27,9 +27,11 @@ from .models import (
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
+from .risk import RiskParams, position_size, r_multiple, size_signal
+from .backtest import backtest, BacktestResult, Trade
 from . import concepts
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
@@ -37,5 +39,7 @@ __all__ = [
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
     "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
+    "RiskParams", "position_size", "r_multiple", "size_signal",
+    "backtest", "BacktestResult", "Trade",
     "__version__",
 ]
