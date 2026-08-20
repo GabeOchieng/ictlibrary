@@ -15,10 +15,13 @@ or a UNIX epoch (seconds). Rows are returned sorted by time.
 from __future__ import annotations
 
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List
 
 from ..models import Candle
+
+# HistData ASCII files are stamped in US Eastern Standard Time (UTC-5, no DST).
+_EST = timezone(timedelta(hours=-5))
 
 _ALIASES = {
     "time": {"time", "timestamp", "date", "datetime"},
@@ -71,6 +74,30 @@ def load_csv(path: str) -> List[Candle]:
                 low=float(row[cols["low"]]),
                 close=float(row[cols["close"]]),
                 volume=float(row[cols["volume"]]) if "volume" in cols and row.get(cols["volume"]) else 0.0,
+            ))
+    out.sort(key=lambda c: c.ts)
+    return out
+
+
+def load_histdata(path: str, tz=_EST) -> List[Candle]:
+    """Load a HistData.com DAT_ASCII file: ``YYYYMMDD HHMMSS;O;H;L;C;V`` with
+    no header, semicolon-separated, timestamps in US Eastern Standard Time.
+    Returns time-sorted UTC candles."""
+    out: List[Candle] = []
+    with open(path, newline="") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(";")
+            if len(parts) < 5:
+                continue
+            dt = datetime.strptime(parts[0], "%Y%m%d %H%M%S").replace(tzinfo=tz)
+            out.append(Candle(
+                ts=dt.astimezone(timezone.utc),
+                open=float(parts[1]), high=float(parts[2]),
+                low=float(parts[3]), close=float(parts[4]),
+                volume=float(parts[5]) if len(parts) > 5 and parts[5] else 0.0,
             ))
     out.sort(key=lambda c: c.ts)
     return out

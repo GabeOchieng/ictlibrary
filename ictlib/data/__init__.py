@@ -1,9 +1,9 @@
 """Data sources for the ICT library: OANDA (live/practice) and CSV."""
 
-from .csv_loader import load_csv, save_csv
+from .csv_loader import load_csv, save_csv, load_histdata
 
-__all__ = ["load_csv", "save_csv", "OandaClient", "OandaError",
-           "AlpacaClient", "AlpacaError"]
+__all__ = ["load_csv", "save_csv", "load_histdata",
+           "OandaClient", "OandaError", "AlpacaClient", "AlpacaError"]
 
 
 def __getattr__(name):

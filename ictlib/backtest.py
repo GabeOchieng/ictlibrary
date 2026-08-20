@@ -101,6 +101,8 @@ def backtest(
     entry_expiry: int = 8,      # bars a pending entry stays live
     entry_mode: str = "limit",  # "limit" (fill at entry price) | "market" (fill on confirm)
     warmup: int = 8,
+    lookback: Optional[int] = None,     # analyse only the last N bars each step (speed)
+    htf_timeframes: Optional[List[int]] = None,
 ) -> BacktestResult:
     from .concepts import infer_pip_size
     if pip is None:
@@ -117,12 +119,15 @@ def backtest(
             _process(t, candles, i, entry_expiry)
         live = [t for t in live if t.status in ("pending", "open")]
 
-        # 2) detect newly-confirmed signals on the data seen so far
-        a = analyze(candles[: i + 1])
+        # 2) detect newly-confirmed signals on the data seen so far (optionally
+        #    only the last ``lookback`` bars, to keep large backtests O(n·W)).
+        offset = max(0, i + 1 - lookback) if lookback else 0
+        a = analyze(candles[offset: i + 1], htf_timeframes=htf_timeframes)
         for s in scan(a, min_score=min_score):
-            if s.index in seen or not s.targets:
+            abs_index = offset + s.index
+            if abs_index in seen or not s.targets:
                 continue
-            seen.add(s.index)
+            seen.add(abs_index)
             entry = s.entry if entry_mode == "limit" else candles[i].close
             # keep only targets that are genuine profit targets beyond the entry
             valid = [t for t in s.targets
@@ -132,7 +137,7 @@ def backtest(
             target = valid[target_index]
             lots = position_size(entry, s.stop, pip, risk)
             t = Trade(
-                direction=s.direction, signal_index=s.index, detected_index=i,
+                direction=s.direction, signal_index=abs_index, detected_index=i,
                 entry=entry, stop=s.stop, target=target, lots=lots, score=s.score,
             )
             if entry_mode == "market":       # fills immediately on confirmation
