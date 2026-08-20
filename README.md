@@ -180,6 +180,31 @@ signal.
 > demonstration of the machinery, not a strategy result. Point it at real OANDA
 > history to evaluate the setup.
 
+## Execution (paper & live)
+
+Route signals to a broker as sized bracket orders (entry + SL + TP):
+
+```python
+from ictlib.execution import PaperBroker, Trader
+
+broker = PaperBroker(balance=10_000, pip=0.0001, pip_value=10)
+trader = Trader(broker, instrument="EUR_USD", pip=0.0001, dry_run=False)
+trader.process(signals)               # submit bracket orders
+for candle in feed:                   # advance the paper simulation
+    broker.feed(candle)
+print(broker.account())               # balance / equity / open positions
+```
+
+```bash
+python -m ictlib.cli --csv data.csv --min-score 3 --paper-trade
+```
+
+Live venues — `OandaBroker` (v20) and `AlpacaBroker` — place real
+`stopLoss`/`takeProfit` bracket orders. **Safety is built in:** the `Trader`
+defaults to `dry_run=True`, and a live broker refuses to trade unless you pass
+`allow_live=True` explicitly. Credentials come from environment variables and
+both default to practice/paper endpoints.
+
 ## Architecture
 
 ```
@@ -222,6 +247,7 @@ ictlib/
                        liquidity, pd_arrays, sessions, asian_range, ipda,
                        turtle_soup, quarterly, crt, killzones, ote
   mtf.py               multi-timeframe HTF bias (resample + top-down read)
+  execution/           PaperBroker, Trader, OANDA/Alpaca bracket-order brokers
   data/                oanda.py (forex), alpaca.py (stocks/crypto), csv_loader.py
 examples/              generate_sample.py, rendered chart
 sample_data/           EUR_USD_M15.csv
@@ -243,4 +269,5 @@ tests/                 22 deterministic tests
 - [x] **Reward:risk** — SD-projection targets + structural-stop mode (configurable).
 - [x] **Refinements** — fib body-anchoring, mitigation lifecycle, stop-run variants,
       90-min cycle, reclaimed OBs, Diamond + Venom models.
-- [ ] Live/paper execution adapter. (Zircon model omitted — demo-stage, unconfirmed.)
+- [x] **Live/paper execution adapter** — PaperBroker + OANDA/Alpaca bracket orders.
+- [ ] (Zircon model omitted — demo-stage, mechanics unconfirmed by the source.)

@@ -137,10 +137,10 @@
     downstream consumes</b> — a scanner, a chart, and a backtester all read the
     same <span class="mono">Analysis</span> snapshot instead of re-deriving it.</p>
     <div class="kpis">
-      <span class="kpi"><b>~24/32</b> categories complete</span>
-      <span class="kpi"><b>104</b> tests passing</span>
+      <span class="kpi"><b>32/32</b> categories detected</span>
+      <span class="kpi"><b>121</b> tests passing</span>
       <span class="kpi"><b>4</b> data sources</span>
-      <span class="kpi"><b>real-data</b> backtested (2009 XAUUSD)</span>
+      <span class="kpi"><b>paper + live</b> execution</span>
     </div>
   </header>
 
@@ -530,6 +530,13 @@
         stops / targets, reports R stats + an equity curve. Validated on real
         2009 XAUUSD (134 trades, 57% win).</p>
         <code>win rate · expectancy · max DD</code>
+      </div>
+      <div class="card">
+        <div class="top"><h3>execution</h3><span class="mod">execution/</span> <span class="tag state">paper + live</span></div>
+        <p>Routes signals to a broker as sized bracket orders (entry + SL + TP).
+        PaperBroker simulates; OANDA/Alpaca go live. Dry-run by default; live
+        needs <code>allow_live=True</code>.</p>
+        <code>Signal → sized bracket order</code>
       </div>
     </div>
   </section>
