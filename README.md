@@ -237,7 +237,10 @@ tests/                 22 deterministic tests
 - [x] **Turtle Soup, Quarterly Theory / PO3, CRT** — named patterns + time-fractal phases.
 - [x] **Multi-timeframe HTF bias** — top-down bias across resampled timeframes.
 - [x] **Alpaca data source** + **HistData loader** — stocks/crypto and real historical files.
-- [x] **Named models** — ICT 2022 Model, Silver Bullet, Judas Swing, Unicorn.
-- [ ] More named models (Diamond, Venom, Unicorn variants, NWOG/NDOG).
-- [ ] SMT divergence (correlated pairs); order-flow / news feeds.
+- [x] **Named models** — ICT 2022 Model, Silver Bullet, Judas Swing, Unicorn, NDOG/NWOG.
+- [x] **PD-array variants** — inversion FVG, BPR, nested FVG, propulsion block, liquidity void.
+- [x] **SMT divergence + intermarket (DXY) + news blackout** — the data-dependent trio.
+- [x] **Reward:risk** — SD-projection targets + structural-stop mode (configurable).
+- [ ] Refinements: fib body-anchoring, stop-run-into-PD variants, mitigation partial/full,
+      more named models (Diamond, Venom, Zircon).
 - [ ] Live/paper execution adapter.
