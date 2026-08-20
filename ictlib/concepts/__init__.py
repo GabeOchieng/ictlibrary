@@ -19,6 +19,9 @@ from .imbalance import find_volume_imbalances
 from .sessions import session_of, session_range, all_session_ranges
 from .asian_range import asian_range
 from .ipda import ipda_levels
+from .turtle_soup import find_turtle_soups
+from .quarterly import quarterly_context, daily_quarter, true_day_open, po3_phase
+from .crt import find_crt_setups
 
 __all__ = [
     "avg_body", "displacement_direction", "is_displacement",
@@ -32,4 +35,6 @@ __all__ = [
     "find_breakers", "find_rejection_blocks", "find_volume_imbalances",
     "session_of", "session_range", "all_session_ranges",
     "asian_range", "ipda_levels",
+    "find_turtle_soups", "quarterly_context", "daily_quarter",
+    "true_day_open", "po3_phase", "find_crt_setups",
 ]

@@ -189,6 +189,48 @@ def render_html(
                          f'fill="{C_OB_BEAR}">IPDA {html.escape(key)}</text>')
         parts.append('</g>')
 
+    # ---- CRT reference candles (community-attributed) ------------------- #
+    if analysis.crt_setups:
+        parts.append('<g data-layer="crt">')
+        for cr in analysis.crt_setups:
+            if cr.ref_end < start:
+                continue
+            x1 = x_of(max(cr.ref_start, start))
+            x2 = x_of(cr.sweep_index if cr.sweep_index >= start else cr.ref_end)
+            yt, yb = y_of(cr.ref_high), y_of(cr.ref_low)
+            parts.append(f'<rect x="{x1:.1f}" y="{yt:.1f}" width="{max(x2-x1,slot):.1f}" '
+                         f'height="{max(yb-yt,1):.1f}" fill="none" stroke="{C_OB_BULL}" '
+                         f'stroke-opacity="0.4" stroke-dasharray="2 3"/>')
+        parts.append('</g>')
+
+    # ---- True Day Open --------------------------------------------------- #
+    q = analysis.quarterly
+    if q is not None and q.tdo is not None:
+        parts.append('<g data-layer="tdo">')
+        yy = y_of(q.tdo)
+        parts.append(f'<line x1="{mL:.1f}" y1="{yy:.1f}" x2="{right_edge():.1f}" '
+                     f'y2="{yy:.1f}" stroke="var(--fg)" stroke-width="0.9" '
+                     f'stroke-opacity="0.5" stroke-dasharray="8 3"/>')
+        parts.append(f'<text x="{mL+120:.1f}" y="{yy-2:.1f}" class="tag" '
+                     f'fill="var(--fg)">TDO {_fmt_price(q.tdo)}</text>')
+        parts.append('</g>')
+
+    # ---- Turtle Soup markers -------------------------------------------- #
+    if analysis.turtle_soups:
+        parts.append('<g data-layer="turtle">')
+        for ts in analysis.turtle_soups:
+            if ts.index < start:
+                continue
+            x = x_of(ts.index)
+            y = y_of(ts.level)
+            up = ts.direction == "bull"
+            yb = y + 12 if up else y - 12
+            parts.append(f'<circle cx="{x:.1f}" cy="{yb:.1f}" r="4" fill="none" '
+                         f'stroke="{C_SWEEP}" stroke-width="1.4"/>')
+            parts.append(f'<text x="{x:.1f}" y="{yb+3:.1f}" class="tag" '
+                         f'fill="{C_SWEEP}" text-anchor="middle">TS</text>')
+        parts.append('</g>')
+
     # ---- liquidity pools (draw first, behind candles) ------------------- #
     parts.append('<g data-layer="pools">')
     for p in analysis.pools:
@@ -395,6 +437,9 @@ def render_html(
         ("sessions", "Session Ranges", "var(--muted)"),
         ("asian", "Asian Range", C_MSS),
         ("ipda", "IPDA Levels", C_OB_BEAR),
+        ("tdo", "True Day Open", "var(--fg)"),
+        ("turtle", "Turtle Soup", C_SWEEP),
+        ("crt", "CRT ranges", C_OB_BULL),
         ("pools", "Liquidity Pools", C_BEAR),
         ("sweeps", "Sweeps", C_SWEEP),
         ("signals", "Signals", C_ENTRY),
@@ -412,6 +457,7 @@ def render_html(
         f'bias <b>{su["bias"]}</b>',
         f'price <b>{su["price_state"] or "—"}</b>',
         f'killzone <b>{su["killzone"] or "—"}</b>',
+        f'PO3 <b>{su.get("phase") or "—"}</b>',
         f'{su["candles"]} bars',
     ])
     stats = " · ".join([

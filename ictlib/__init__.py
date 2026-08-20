@@ -23,7 +23,8 @@ Quick start
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
-    SessionRange, AsianRange, IPDALevels, Signal, to_jsonable,
+    SessionRange, AsianRange, IPDALevels,
+    TurtleSoup, CRTSetup, QuarterlyContext, Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
@@ -31,13 +32,13 @@ from .risk import RiskParams, position_size, r_multiple, size_signal
 from .backtest import backtest, BacktestResult, Trade
 from . import concepts
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
     "LiquidityPool", "Sweep", "DealingRange", "Breaker", "RejectionBlock",
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
-    "Signal", "to_jsonable",
+    "TurtleSoup", "CRTSetup", "QuarterlyContext", "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "RiskParams", "position_size", "r_multiple", "size_signal",
     "backtest", "BacktestResult", "Trade",

@@ -15,6 +15,7 @@ from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
+    TurtleSoup, CRTSetup, QuarterlyContext,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -22,6 +23,7 @@ from .concepts import (
     active_killzone, find_dealing_range,
     find_breakers, find_rejection_blocks, find_volume_imbalances,
     all_session_ranges, asian_range, ipda_levels,
+    find_turtle_soups, quarterly_context, find_crt_setups,
 )
 
 
@@ -41,6 +43,9 @@ class Analysis:
     session_ranges: List[SessionRange] = field(default_factory=list)
     asian_range: Optional[AsianRange] = None
     ipda: Optional[IPDALevels] = None
+    turtle_soups: List[TurtleSoup] = field(default_factory=list)
+    crt_setups: List[CRTSetup] = field(default_factory=list)
+    quarterly: Optional[QuarterlyContext] = None
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -107,6 +112,10 @@ class Analysis:
             "session_ranges": len(self.session_ranges),
             "asian_range": bool(self.asian_range),
             "ipda_days": self.ipda.days_used if self.ipda else 0,
+            "turtle_soups": len(self.turtle_soups),
+            "crt_setups": len(self.crt_setups),
+            "quarter": self.quarterly.daily_quarter if self.quarterly else None,
+            "phase": self.quarterly.phase if self.quarterly else None,
         }
 
 
@@ -136,6 +145,9 @@ def analyze(
     sessions = all_session_ranges(candles)
     asia = asian_range(candles, anchor="kz")
     ipda = ipda_levels(candles)
+    turtles = find_turtle_soups(candles, sweeps)
+    crt = find_crt_setups(candles)
+    quarterly = quarterly_context(candles)
 
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
@@ -165,6 +177,9 @@ def analyze(
         session_ranges=sessions,
         asian_range=asia,
         ipda=ipda,
+        turtle_soups=turtles,
+        crt_setups=crt,
+        quarterly=quarterly,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

@@ -199,4 +199,23 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
         reasons.append("breaker block confluence at entry")
         score += 1
 
+    # Turtle Soup: the sweep resolved as a named failed breakout.
+    if any(ts.index == sweep.index for ts in analysis.turtle_soups):
+        reasons.append("turtle soup (failed breakout confirmed)")
+        score += 1
+
+    # Power of Three / Quarterly Theory: manipulation & distribution quarters are
+    # the sweep + true-move phases that favour this setup.
+    q = analysis.quarterly
+    if q and q.phase in ("manipulation", "distribution"):
+        reasons.append(f"PO3 {q.phase} phase ({q.daily_quarter})")
+        score += 1
+
+    # True Day Open: intraday discount for longs / premium for shorts.
+    if q and q.tdo is not None:
+        want_tdo = "discount" if direction == "long" else "premium"
+        if q.price_vs_tdo == want_tdo:
+            reasons.append(f"intraday {want_tdo} vs TDO {q.tdo:.5f}")
+            score += 1
+
     return reasons, score

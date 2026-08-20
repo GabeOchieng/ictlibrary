@@ -372,6 +372,53 @@ class IPDALevels:
     lookbacks: tuple = (20, 40, 60)
 
 
+@dataclass
+class TurtleSoup:
+    """A named failed-breakout / swing-failure pattern
+    (concepts/20-turtle-soup). A sweep of a level that immediately reverses
+    with displacement — the price-action mirror of a liquidity sweep."""
+
+    index: int          # the sweep candle
+    ts: datetime
+    direction: str      # "bull" (failed bearish breakout) | "bear"
+    level: float
+    confirm_index: int  # bar where the reversal displacement confirmed
+    pd_side: Optional[str] = None
+
+
+@dataclass
+class CRTSetup:
+    """Candle Range Theory setup (concepts/21-crt).
+
+    NOTE: CRT is *community-attributed*, not ICT-original — ICT stated it is
+    "based on my ideas but not my concept". Included for completeness.
+    A later bar sweeps one bound of a HTF reference candle and closes back
+    inside; the target is the opposite bound."""
+
+    ref_start: int
+    ref_end: int
+    ref_high: float
+    ref_low: float
+    direction: str      # "bull" (low swept -> target high) | "bear"
+    sweep_index: int
+    target: float
+
+
+@dataclass
+class QuarterlyContext:
+    """Quarterly Theory / Power-of-Three time context
+    (concepts/22-quarterly-theory, concepts/12-power-of-three).
+
+    Daily quarters map to the AMD-X phases: Q1 accumulation, Q2 manipulation,
+    Q3 distribution, Q4 continuation/reversal."""
+
+    tdo: Optional[float] = None            # True Day Open (00:00 NY price)
+    tdo_index: Optional[int] = None
+    daily_quarter: Optional[str] = None    # "Q1".."Q4"
+    phase: Optional[str] = None            # accumulation | manipulation | ...
+    price_vs_tdo: Optional[str] = None     # premium | discount | at
+
+
 @dataclass(frozen=True)
 class Sweep:
     """Liquidity sweep / raid (concepts/02-liquidity/liquidity-sweep).
