@@ -367,6 +367,28 @@
       </div>
 
       <div class="card">
+        <div class="top"><h3>breaker_blocks</h3><span class="mod">breaker_blocks.py</span> <span class="tag state">tracks retest</span></div>
+        <p>An order block that failed and flipped polarity — price closed through
+        the body against it, with displacement. The zone now defends the new
+        direction on retest.</p>
+        <code>close through OB body + displacement</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>rejection_blocks</h3><span class="mod">rejection_blocks.py</span></div>
+        <p>A long-wick rejection at a key level; the rejected wick (not the body)
+        is the zone and the SL anchor.</p>
+        <code>wick ≥ 60% of range · at a level</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>imbalance</h3><span class="mod">imbalance.py</span> <span class="tag state">tracks mitigation</span></div>
+        <p>Volume imbalance — a body-vs-body gap between consecutive candles. A
+        softer FVG-like reference; conviction stacks when it nests in an FVG.</p>
+        <code>O_n ≠ C_{n-1} (wicks may overlap)</code>
+      </div>
+
+      <div class="card">
         <div class="top"><h3>liquidity</h3><span class="mod">liquidity.py</span> <span class="tag state">tracks swept</span></div>
         <p>BSL/SSL pools at swings, EQH/EQL clusters within tolerance, and the sweep
         that runs them: wick through + close back + 60% wick.</p>

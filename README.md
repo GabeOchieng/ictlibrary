@@ -26,6 +26,9 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 | **Displacement** | `concepts/displacement.py` | `body ≥ 1.5×avg`, `body/range ≥ 0.70`, `opp_wick/range ≤ 0.20` |
 | **Fair Value Gap** | `concepts/fvg.py` | bull `L_{n+1} > H_{n-1}`, bear `H_{n+1} < L_{n-1}`; CE = midpoint |
 | **Order Block** | `concepts/order_blocks.py` | last opposite candle before a structure-breaking displacement; body = MT zone |
+| **Breaker Block** | `concepts/breaker_blocks.py` | a failed OB that flips polarity (close through body + displacement) |
+| **Rejection Block** | `concepts/rejection_blocks.py` | long wick (≥60%) rejecting a key level; the wick is the zone |
+| **Volume Imbalance** | `concepts/imbalance.py` | body-vs-body gap `O_n ≠ C_{n-1}` (wicks may overlap) |
 | **Liquidity pools** | `concepts/liquidity.py` | BSL/SSL at swings; EQH/EQL clusters within a pip tolerance |
 | **Liquidity sweep** | `concepts/liquidity.py` | wick beyond pool + close back inside + ≥60% wick |
 | **Killzones** | `concepts/killzones.py` | NY-time windows (Asia, London, NY AM/PM) + silver bullet, DST-aware |
@@ -144,6 +147,7 @@ ictlib/
   cli.py               python -m ictlib.cli
   sample_setups.py     canonical hand-authored setups (shared by demo + tests)
   concepts/            structure, displacement, fvg, order_blocks,
+                       breaker_blocks, rejection_blocks, imbalance,
                        liquidity, pd_arrays, killzones, ote
   data/                oanda.py (v20 REST), csv_loader.py
 examples/              generate_sample.py, rendered chart
@@ -154,7 +158,7 @@ tests/                 22 deterministic tests
 ## Roadmap
 
 - [x] **PD arrays** — dealing range, equilibrium, premium/discount classification.
-- [ ] Breaker & rejection blocks; volume imbalance / inversion FVG.
+- [x] **Breaker & rejection blocks, volume imbalance** — the rest of the PD-array family.
 - [ ] Asian range, session ranges, IPDA lookback ranges.
 - [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
 - [ ] Backtester on top of `scan()` with equity curve + R distribution.
