@@ -115,6 +115,39 @@ the wrong side of EQ are flagged rather than silently scored.
 
 ---
 
+## Backtesting & risk
+
+```python
+from ictlib import backtest, RiskParams
+from ictlib.data import load_csv
+
+candles = load_csv("sample_data/EUR_USD_M15_backtest.csv")
+res = backtest(candles, instrument="EUR_USD",
+               risk=RiskParams(equity=10_000, risk_pct=0.01),
+               min_score=2, entry_mode="limit")
+print(res.stats())        # trades, win_rate, total_r, expectancy_r, profit_factor, max_drawdown_r
+print(res.equity_curve)   # cumulative R per closed trade
+```
+
+The backtester is **walk-forward**: at each bar it re-analyses only the candles
+seen so far (no lookahead), registers newly-confirmed signals, and simulates
+fills/stops/targets bar-by-bar — stop checked before target (worst case),
+pending limit entries expire, results reported in R multiples.
+
+```bash
+# from the CLI, with an equity-curve chart
+python -m ictlib.cli --csv sample_data/EUR_USD_M15_backtest.csv --backtest \
+    --instrument EUR_USD --min-score 2 --equity-html equity.html
+```
+
+Position sizing follows `risk_$ / sl_distance` with per-instrument pip values
+(`ictlib.risk`). `size_signal(signal, pip)` attaches lots + per-target R to any
+signal.
+
+> Backtests run on the bundled data are **synthetic and illustrative** — a
+> demonstration of the machinery, not a strategy result. Point it at real OANDA
+> history to evaluate the setup.
+
 ## Architecture
 
 ```
@@ -147,7 +180,9 @@ ictlib/
   models.py            Candle + every primitive as a typed dataclass
   analysis.py          analyze() -> Analysis snapshot
   scanner.py           scan() -> signals (sweep -> MSS -> FVG/OB)
-  viz.py               render_html() self-contained annotated chart
+  risk.py              position sizing, R-multiples, partial schedules
+  backtest.py          walk-forward backtester -> stats + equity curve
+  viz.py               render_html() chart + render_equity_html() equity curve
   cli.py               python -m ictlib.cli
   sample_setups.py     canonical hand-authored setups (shared by demo + tests)
   concepts/            structure, displacement, fvg, order_blocks,
@@ -165,7 +200,7 @@ tests/                 22 deterministic tests
 - [x] **PD arrays** — dealing range, equilibrium, premium/discount classification.
 - [x] **Breaker & rejection blocks, volume imbalance** — the rest of the PD-array family.
 - [x] **Sessions, Asian range, IPDA lookback** — time-based draw-on-liquidity levels.
+- [x] **Risk management + walk-forward backtester** — position sizing, R-multiples, equity curve.
 - [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
-- [ ] Backtester on top of `scan()` with equity curve + R distribution.
 - [ ] Named models: Silver Bullet, Judas Swing, Turtle Soup, 2022 model.
 - [ ] Live/paper execution adapter for OANDA.

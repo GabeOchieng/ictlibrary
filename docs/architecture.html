@@ -130,7 +130,7 @@
     <h1>ICT concept-detection library</h1>
     <p class="lede">A dependency-light Python engine that turns raw candles into the
     building blocks of ICT price analysis. The <b>primitive layer detects; everything
-    downstream consumes</b> — a scanner, a chart, and (next) a backtester all read the
+    downstream consumes</b> — a scanner, a chart, and a backtester all read the
     same <span class="mono">Analysis</span> snapshot instead of re-deriving it.</p>
   </header>
 
@@ -221,7 +221,7 @@
           <!-- fan to consumers -->
           <path class="edge accent" marker-end="url(#arAmber)" d="M440,460 C400,486 300,486 262,506"/>
           <path class="edge" marker-end="url(#ar)" d="M480,460 L480,506"/>
-          <path class="edge dash" marker-end="url(#ar)" d="M520,460 C560,486 680,486 720,506"/>
+          <path class="edge" marker-end="url(#ar)" d="M520,460 C560,486 680,486 720,506"/>
           <text class="etxt" x="300" y="498" text-anchor="middle">consume</text>
 
           <!-- consumers -->
@@ -233,9 +233,9 @@
           <text class="lbl big" x="482" y="540" text-anchor="middle">viz.render_html()</text>
           <text class="lbl sm mut" x="482" y="560" text-anchor="middle">→ annotated chart</text>
 
-          <rect class="node dash" x="612" y="510" width="220" height="66" rx="10"/>
-          <text class="lbl big mut" x="722" y="540" text-anchor="middle">backtester / bot</text>
-          <text class="lbl sm mut" x="722" y="560" text-anchor="middle">planned — same snapshot</text>
+          <rect class="node" x="612" y="510" width="220" height="66" rx="10"/>
+          <text class="lbl big" x="722" y="540" text-anchor="middle">backtest()</text>
+          <text class="lbl sm mut" x="722" y="560" text-anchor="middle">→ R stats + equity curve</text>
         </svg>
       </div>
       <figcaption>Detection lives in <b>one place</b>. The seven concept modules read
@@ -246,7 +246,6 @@
     <div class="legend">
       <span><i class="sw amber"></i> critical path — signal output</span>
       <span><i class="sw"></i> data / detection flow</span>
-      <span><i class="sw mut"></i> planned</span>
     </div>
   </section>
 
