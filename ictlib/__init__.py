@@ -37,9 +37,10 @@ from .setups import classify_models, find_unicorns, find_diamonds
 from .smt import find_smt_divergence
 from .intermarket import dollar_index_smt, intermarket_bias
 from .news import in_blackout, news_windows
+from .execution import PaperBroker, Trader
 from . import concepts
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
@@ -55,5 +56,6 @@ __all__ = [
     "backtest", "BacktestResult", "Trade",
     "multi_timeframe_bias", "resample_tf",
     "classify_models", "find_unicorns", "find_diamonds",
+    "PaperBroker", "Trader",
     "__version__",
 ]

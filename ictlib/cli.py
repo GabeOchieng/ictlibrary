@@ -117,6 +117,10 @@ def build_parser() -> argparse.ArgumentParser:
     bt.add_argument("--entry-mode", default="limit", choices=["limit", "market"])
     bt.add_argument("--equity-html", help="write the equity curve to this HTML path")
 
+    ex = p.add_argument_group("execution")
+    ex.add_argument("--paper-trade", action="store_true",
+                    help="route signals to an in-memory paper broker and simulate")
+
     out = p.add_argument_group("output")
     out.add_argument("--html", help="write annotated chart to this HTML path")
     out.add_argument("--json", action="store_true", help="emit JSON to stdout")
@@ -172,6 +176,25 @@ def main(argv=None) -> int:
                     instrument=args.instrument, granularity=args.granularity,
                     signals=signals)
         print(f"\nchart written to {args.html}")
+
+    if args.paper_trade:
+        from .execution import PaperBroker, Trader
+        from .risk import RiskParams
+        broker = PaperBroker(balance=args.equity, pip=analysis.pip,
+                             pip_value=10.0)
+        trader = Trader(broker, instrument=args.instrument, pip=analysis.pip,
+                        risk=RiskParams(equity=args.equity, risk_pct=args.risk_pct),
+                        min_score=args.min_score, dry_run=False,
+                        logger=lambda m: print(f"  {m}"))
+        print(f"\n=== Paper trade: {len(signals)} signal(s) ===")
+        trader.process(signals)
+        for c in candles:               # replay history to simulate fills/exits
+            broker.feed(c)
+        acc = broker.account()
+        closed = [p for p in broker.positions() if p.status == "closed"]
+        wins = sum(1 for p in closed if p.pnl > 0)
+        print(f"orders={len(broker.orders())}  filled/closed={len(closed)}  "
+              f"wins={wins}  balance={acc.balance:.2f} {acc.currency}")
     return 0
 
 
