@@ -22,17 +22,17 @@ Quick start
 
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
-    Signal, to_jsonable,
+    DealingRange, Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
 from .scanner import scan, scan_candles
 from . import concepts
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "Candle", "Swing", "StructureEvent", "FVG", "OrderBlock",
-    "LiquidityPool", "Sweep", "Signal", "to_jsonable",
+    "LiquidityPool", "Sweep", "DealingRange", "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "__version__",
 ]

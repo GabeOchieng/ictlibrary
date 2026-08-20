@@ -175,4 +175,16 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
         reasons.append(f"swept {pool.label} (dense pool)")
         score += 1
 
+    # Premium/discount discipline: longs should originate at a discount, shorts
+    # at a premium (concepts/05-pd-arrays). Reward alignment, flag a violation.
+    dr = analysis.dealing_range
+    if dr is not None:
+        side = dr.classify(entry)
+        want_side = "discount" if direction == "long" else "premium"
+        if side == want_side:
+            reasons.append(f"entry at {side} (EQ {dr.eq:.5f}) — correct side of range")
+            score += 1
+        elif side != "equilibrium":
+            reasons.append(f"⚠ entry at {side} for a {direction} — against PD discipline")
+
     return reasons, score

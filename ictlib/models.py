@@ -124,6 +124,7 @@ class FVG:
     has_displacement: bool = False
     mitigated: bool = False
     mitigated_index: Optional[int] = None
+    pd_side: Optional[str] = None   # "premium" | "discount" | "equilibrium"
 
     @property
     def ce(self) -> float:
@@ -151,10 +152,61 @@ class OrderBlock:
     event_index: int    # the structure break this OB gave rise to
     mitigated: bool = False
     mitigated_index: Optional[int] = None
+    pd_side: Optional[str] = None   # "premium" | "discount" | "equilibrium"
 
     @property
     def mt(self) -> float:
         return (self.low + self.high) / 2.0
+
+
+# --------------------------------------------------------------------------- #
+# PD arrays — dealing range, premium / discount, equilibrium
+# --------------------------------------------------------------------------- #
+@dataclass
+class DealingRange:
+    """The reference frame for premium/discount (concepts/05-pd-arrays/dealing-range).
+
+    Bounded by the most recent unbroken long-term high/low on the timeframe.
+    EQ (equilibrium) is the 50% midpoint — THE reference for classifying every
+    PD array (concepts/27-equilibrium/dealing-range-equilibrium).
+    """
+
+    top: float          # LTH_ext
+    bottom: float       # LTL_ext
+    top_index: int
+    bottom_index: int
+    top_degree: str = "STH"    # STH | ITH | LTH | RANGE (fallback)
+    bottom_degree: str = "STL"
+
+    @property
+    def eq(self) -> float:
+        return (self.top + self.bottom) / 2.0
+
+    @property
+    def size(self) -> float:
+        return self.top - self.bottom
+
+    def contains(self, price: float) -> bool:
+        return self.bottom <= price <= self.top
+
+    def classify(self, price: float, tol_frac: float = 0.005) -> str:
+        """premium (above EQ) / discount (below EQ) / equilibrium (within tol)."""
+        tol = self.size * tol_frac
+        if price > self.eq + tol:
+            return "premium"
+        if price < self.eq - tol:
+            return "discount"
+        return "equilibrium"
+
+    def depth(self, price: float) -> float:
+        """Signed depth from EQ: +1 at the high (deep premium), -1 at the low
+        (deep discount), 0 at EQ. |depth| == 0.79 is the OTE 0.79 level."""
+        eq = self.eq
+        if price >= eq:
+            span = self.top - eq
+            return (price - eq) / span if span else 0.0
+        span = eq - self.bottom
+        return -(eq - price) / span if span else 0.0
 
 
 # --------------------------------------------------------------------------- #

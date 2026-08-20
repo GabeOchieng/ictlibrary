@@ -110,6 +110,32 @@ def render_html(
                      f'{t.strftime("%m-%d %H:%M")}</text>')
     parts.append('</g>')
 
+    # ---- dealing range: premium / discount bands + EQ (drawn first) ----- #
+    dr = analysis.dealing_range
+    if dr is not None:
+        yt, ye, yb = y_of(dr.top), y_of(dr.eq), y_of(dr.bottom)
+        parts.append('<g data-layer="pd">')
+        # premium band (above EQ) tinted bearish, discount band tinted bullish
+        parts.append(f'<rect x="{mL:.1f}" y="{yt:.1f}" width="{plot_w:.1f}" '
+                     f'height="{max(ye-yt,1):.1f}" fill="{C_BEAR}" fill-opacity="0.05"/>')
+        parts.append(f'<rect x="{mL:.1f}" y="{ye:.1f}" width="{plot_w:.1f}" '
+                     f'height="{max(yb-ye,1):.1f}" fill="{C_BULL}" fill-opacity="0.05"/>')
+        # EQ line
+        parts.append(f'<line x1="{mL:.1f}" y1="{ye:.1f}" x2="{right_edge():.1f}" '
+                     f'y2="{ye:.1f}" stroke="var(--muted)" stroke-width="1" '
+                     f'stroke-dasharray="7 4"/>')
+        parts.append(f'<text x="{mL+3:.1f}" y="{ye-3:.1f}" class="tag" '
+                     f'fill="var(--muted)">EQ {_fmt_price(dr.eq)}</text>')
+        # range bounds
+        for price, deg in ((dr.top, dr.top_degree), (dr.bottom, dr.bottom_degree)):
+            yy = y_of(price)
+            parts.append(f'<line x1="{mL:.1f}" y1="{yy:.1f}" x2="{right_edge():.1f}" '
+                         f'y2="{yy:.1f}" stroke="var(--muted)" stroke-width="0.8" '
+                         f'stroke-opacity="0.6"/>')
+            parts.append(f'<text x="{mL+3:.1f}" y="{yy-3:.1f}" class="tag" '
+                         f'fill="var(--muted)">{deg}</text>')
+        parts.append('</g>')
+
     # ---- liquidity pools (draw first, behind candles) ------------------- #
     parts.append('<g data-layer="pools">')
     for p in analysis.pools:
@@ -256,6 +282,7 @@ def render_html(
     # ---- legend + summary ----------------------------------------------- #
     layers = [
         ("candles", "Candles", "var(--fg)"),
+        ("pd", "Premium / Discount", C_MSS),
         ("swings", "Swings", C_BULL),
         ("structure", "BOS / CHoCH / MSS", C_MSS),
         ("fvg", "Fair Value Gaps", C_BULL),
@@ -275,6 +302,7 @@ def render_html(
         f'<b>{html.escape(instrument or "series")}</b>',
         html.escape(granularity) if granularity else "",
         f'bias <b>{su["bias"]}</b>',
+        f'price <b>{su["price_state"] or "—"}</b>',
         f'killzone <b>{su["killzone"] or "—"}</b>',
         f'{su["candles"]} bars',
     ])

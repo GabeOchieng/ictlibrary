@@ -13,11 +13,12 @@ from typing import List, Optional
 
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
+    DealingRange,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
     find_fvgs, find_order_blocks, find_pools, find_sweeps, infer_pip_size,
-    active_killzone,
+    active_killzone, find_dealing_range,
 )
 
 
@@ -31,6 +32,7 @@ class Analysis:
     order_blocks: List[OrderBlock] = field(default_factory=list)
     pools: List[LiquidityPool] = field(default_factory=list)
     sweeps: List[Sweep] = field(default_factory=list)
+    dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
 
@@ -47,11 +49,21 @@ class Analysis:
     def open_pools(self) -> List[LiquidityPool]:
         return [p for p in self.pools if not p.swept]
 
+    @property
+    def price_state(self) -> Optional[str]:
+        """Where the latest close sits relative to dealing-range equilibrium."""
+        if not self.dealing_range or not self.candles:
+            return None
+        return self.dealing_range.classify(self.candles[-1].close)
+
     def summary(self) -> dict:
+        dr = self.dealing_range
         return {
             "candles": len(self.candles),
             "bias": self.bias,
             "killzone": self.killzone,
+            "price_state": self.price_state,
+            "equilibrium": round(dr.eq, 5) if dr else None,
             "swings": len(self.swings),
             "structure_events": len(self.events),
             "fvgs": len(self.fvgs),
@@ -80,6 +92,14 @@ def analyze(
     obs = find_order_blocks(candles, events)
     pools = find_pools(swings, pip=pip, eq_tolerance_pips=eq_tolerance_pips)
     sweeps = find_sweeps(candles, pools)
+    drange = find_dealing_range(candles, swings)
+
+    # tag every PD array with the side of equilibrium it sits on
+    if drange is not None:
+        for f in fvgs:
+            f.pd_side = drange.classify(f.ce)
+        for o in obs:
+            o.pd_side = drange.classify(o.mt)
 
     return Analysis(
         candles=candles,
@@ -90,6 +110,7 @@ def analyze(
         order_blocks=obs,
         pools=pools,
         sweeps=sweeps,
+        dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,
     )

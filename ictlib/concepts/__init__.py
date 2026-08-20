@@ -12,6 +12,7 @@ from .order_blocks import find_order_blocks, unmitigated as unmitigated_obs
 from .liquidity import find_pools, find_sweeps, infer_pip_size
 from .killzones import active_killzone, in_silver_bullet, active_windows
 from .ote import ote_from_leg, OTE
+from .pd_arrays import find_dealing_range, swing_degrees
 
 __all__ = [
     "avg_body", "displacement_direction", "is_displacement",
@@ -21,4 +22,5 @@ __all__ = [
     "find_pools", "find_sweeps", "infer_pip_size",
     "active_killzone", "in_silver_bullet", "active_windows",
     "ote_from_leg", "OTE",
+    "find_dealing_range", "swing_degrees",
 ]
