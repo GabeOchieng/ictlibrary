@@ -21,7 +21,7 @@ from typing import List, Optional
 from .models import Signal, Sweep
 from .analysis import Analysis, analyze
 from .concepts.killzones import active_killzone, in_silver_bullet
-from .concepts.ote import ote_from_leg
+from .concepts.ote import ote_from_leg, sd_projections, SD_OTE
 from .setups import classify_models
 
 
@@ -31,6 +31,8 @@ def scan(
     mss_window: int = 12,
     min_score: int = 2,
     require_htf_alignment: bool = False,
+    stop_mode: str = "structure",   # "structure" (PD-array invalidation) | "sweep"
+    use_sd_targets: bool = True,     # add standard-deviation projection targets
 ) -> List[Signal]:
     """Produce signals from a completed :class:`Analysis`.
 
@@ -54,26 +56,25 @@ def scan(
         if entry_fvg is None and entry_ob is None:
             continue
 
+        if entry_fvg is not None:
+            zone = (entry_fvg.low, entry_fvg.high)
+            entry = entry_fvg.ce
+        else:
+            zone = (entry_ob.low, entry_ob.high)
+            entry = entry_ob.mt
+
+        buf = _stop_buffer(analysis, mss.index)
         if want == "bull":
             direction = "long"
-            if entry_fvg is not None:
-                zone = (entry_fvg.low, entry_fvg.high)
-                entry = entry_fvg.ce
-            else:
-                zone = (entry_ob.low, entry_ob.high)
-                entry = entry_ob.mt
-            stop = sweep.extreme - 2 * analysis.pip
-            targets = _draw_on_liquidity(analysis, "BSL", entry)
+            # structural stop = below the entry PD array; else beyond the sweep
+            stop = (zone[0] - buf) if stop_mode == "structure" else (sweep.extreme - buf)
+            targets = _targets(analysis, "BSL", entry, sweep, mss, "bull",
+                               use_sd_targets)
         else:
             direction = "short"
-            if entry_fvg is not None:
-                zone = (entry_fvg.low, entry_fvg.high)
-                entry = entry_fvg.ce
-            else:
-                zone = (entry_ob.low, entry_ob.high)
-                entry = entry_ob.mt
-            stop = sweep.extreme + 2 * analysis.pip
-            targets = _draw_on_liquidity(analysis, "SSL", entry)
+            stop = (zone[1] + buf) if stop_mode == "structure" else (sweep.extreme + buf)
+            targets = _targets(analysis, "SSL", entry, sweep, mss, "bear",
+                               use_sd_targets)
         if require_htf_alignment and analysis.mtf is not None:
             if analysis.mtf.bias != "neutral" and not analysis.mtf.aligned(direction):
                 continue
@@ -159,6 +160,40 @@ def _ob_for_event(analysis, event_index):
         if o.event_index == event_index and not o.mitigated:
             return o
     return None
+
+
+def _atr(candles, index, n=14) -> float:
+    start = max(0, index - n)
+    window = candles[start:index] or candles[:1]
+    return sum(c.high - c.low for c in window) / len(window)
+
+
+def _stop_buffer(analysis, index, mult: float = 0.35) -> float:
+    """Volatility-aware stop buffer (a fraction of ATR), floored at 2 pips —
+    keeps structural stops off the exact wick without being instrument-blind."""
+    return max(mult * _atr(analysis.candles, index), 2 * analysis.pip)
+
+
+def _targets(analysis, kind, entry, sweep, mss, leg_dir, use_sd, *, limit=4):
+    """Draw-on-liquidity pools plus standard-deviation projection targets,
+    nearest-first (concepts/28-fibonacci-levels/standard-deviation-projections)."""
+    levels = list(_draw_on_liquidity(analysis, kind, entry, limit=99))
+    if use_sd:
+        candles = analysis.candles
+        end = min(mss.index + 2, len(candles) - 1)
+        seg = candles[sweep.index:end + 1] or [candles[sweep.index]]
+        if leg_dir == "bull":
+            leg_end = max(c.high for c in seg)
+        else:
+            leg_end = min(c.low for c in seg)
+        for price in sd_projections(sweep.extreme, leg_end).values():
+            if (price > entry) == (leg_dir == "bull"):
+                levels.append(price)
+    if leg_dir == "bull":
+        out = sorted(set(lv for lv in levels if lv > entry))
+    else:
+        out = sorted(set(lv for lv in levels if lv < entry), reverse=True)
+    return out[:limit]
 
 
 def _draw_on_liquidity(analysis, kind, entry, *, limit: int = 3) -> List[float]:

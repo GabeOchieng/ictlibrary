@@ -42,6 +42,19 @@ def _retrace(low: float, high: float, direction: str, r: float) -> float:
     return low + r * (high - low)
 
 
+# Standard-deviation projection sets (concepts/28-fibonacci-levels/
+# standard-deviation-projections). The OTE-series preset is the shallower one.
+SD_OTE = (-0.5, -1.0, -1.5, -2.0)
+SD_WIDE = (-1.5, -2.0, -2.5, -4.0)
+
+
+def sd_projections(leg_start: float, leg_end: float, levels=SD_OTE) -> dict:
+    """Extension targets beyond a measured leg: project(level) = leg_end -
+    level*leg_size, with negative levels extending past leg_end."""
+    leg_size = leg_end - leg_start
+    return {f"{lvl}SD": leg_end - lvl * leg_size for lvl in levels}
+
+
 def ote_from_leg(leg_start: float, leg_end: float, direction: str) -> OTE:
     """Build the OTE band from a measured leg's origin and terminal prices."""
     low, high = min(leg_start, leg_end), max(leg_start, leg_end)

@@ -103,6 +103,8 @@ def backtest(
     warmup: int = 8,
     lookback: Optional[int] = None,     # analyse only the last N bars each step (speed)
     htf_timeframes: Optional[List[int]] = None,
+    stop_mode: str = "structure",
+    use_sd_targets: bool = True,
 ) -> BacktestResult:
     from .concepts import infer_pip_size
     if pip is None:
@@ -123,7 +125,8 @@ def backtest(
         #    only the last ``lookback`` bars, to keep large backtests O(n·W)).
         offset = max(0, i + 1 - lookback) if lookback else 0
         a = analyze(candles[offset: i + 1], htf_timeframes=htf_timeframes)
-        for s in scan(a, min_score=min_score):
+        for s in scan(a, min_score=min_score, stop_mode=stop_mode,
+                      use_sd_targets=use_sd_targets):
             abs_index = offset + s.index
             if abs_index in seen or not s.targets:
                 continue
