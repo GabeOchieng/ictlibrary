@@ -236,7 +236,8 @@ tests/                 22 deterministic tests
 - [x] **Risk management + walk-forward backtester** — position sizing, R-multiples, equity curve.
 - [x] **Turtle Soup, Quarterly Theory / PO3, CRT** — named patterns + time-fractal phases.
 - [x] **Multi-timeframe HTF bias** — top-down bias across resampled timeframes.
-- [x] **Alpaca data source** — US stocks + crypto, alongside OANDA forex.
-- [ ] Named models: Silver Bullet, Judas Swing, 2022 model.
+- [x] **Alpaca data source** + **HistData loader** — stocks/crypto and real historical files.
+- [x] **Named models** — ICT 2022 Model, Silver Bullet, Judas Swing, Unicorn.
+- [ ] More named models (Diamond, Venom, Unicorn variants, NWOG/NDOG).
 - [ ] SMT divergence (correlated pairs); order-flow / news feeds.
 - [ ] Live/paper execution adapter.
