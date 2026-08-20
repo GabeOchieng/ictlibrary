@@ -38,6 +38,7 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 | **Turtle Soup** | `concepts/turtle_soup.py` | failed breakout = sweep + confirming reversal displacement |
 | **Quarterly Theory / PO3** | `concepts/quarterly.py` | True Day Open, daily quarters → AMD phases |
 | **CRT** *(community)* | `concepts/crt.py` | HTF candle-range sweep → opposite bound (non-ICT-original) |
+| **HTF bias (multi-TF)** | `mtf.py` | top-down bias across resampled H1/H4/D; drives setup side |
 | **OTE** | `concepts/ote.py` | 0.62–0.79 retracement band of a measured leg |
 
 Each detector marks **state** where the concept has it: FVGs and order blocks
@@ -62,12 +63,34 @@ python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv --html chart.html
 python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv --json
 ```
 
-### Live forex via OANDA
+### Live data
 
+**OANDA** (forex):
 ```bash
 export OANDA_API_KEY="your-token"
 export OANDA_ENV="practice"      # or "live"
 python -m ictlib.cli --oanda --instrument EUR_USD --granularity M15 --count 300 --html eurusd.html
+```
+
+**Alpaca** (US stocks + crypto):
+```bash
+export APCA_API_KEY_ID="your-key"
+export APCA_API_SECRET_KEY="your-secret"
+python -m ictlib.cli --alpaca --instrument AAPL --granularity M15            # stocks
+python -m ictlib.cli --alpaca --asset crypto --instrument BTC/USD --granularity H1
+```
+
+### Multi-timeframe HTF bias
+
+```bash
+# read a top-down H1+H4 bias and only keep signals aligned with it
+python -m ictlib.cli --csv data.csv --htf H1,H4 --require-htf
+```
+```python
+a = analyze(candles, htf_timeframes=[60, 240])   # minutes
+a.mtf.bias          # aggregate bullish / bearish / neutral
+a.mtf.reads         # per-timeframe [TFRead(H4, ...), TFRead(H1, ...)]
+scan(a, require_htf_alignment=True)               # drop counter-bias signals
 ```
 
 ---
@@ -192,7 +215,8 @@ ictlib/
                        breaker_blocks, rejection_blocks, imbalance,
                        liquidity, pd_arrays, sessions, asian_range, ipda,
                        turtle_soup, quarterly, crt, killzones, ote
-  data/                oanda.py (v20 REST), csv_loader.py
+  mtf.py               multi-timeframe HTF bias (resample + top-down read)
+  data/                oanda.py (forex), alpaca.py (stocks/crypto), csv_loader.py
 examples/              generate_sample.py, rendered chart
 sample_data/           EUR_USD_M15.csv
 tests/                 22 deterministic tests
@@ -205,6 +229,8 @@ tests/                 22 deterministic tests
 - [x] **Sessions, Asian range, IPDA lookback** — time-based draw-on-liquidity levels.
 - [x] **Risk management + walk-forward backtester** — position sizing, R-multiples, equity curve.
 - [x] **Turtle Soup, Quarterly Theory / PO3, CRT** — named patterns + time-fractal phases.
-- [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
+- [x] **Multi-timeframe HTF bias** — top-down bias across resampled timeframes.
+- [x] **Alpaca data source** — US stocks + crypto, alongside OANDA forex.
 - [ ] Named models: Silver Bullet, Judas Swing, 2022 model.
-- [ ] Live/paper execution adapter for OANDA.
+- [ ] SMT divergence (correlated pairs); order-flow / news feeds.
+- [ ] Live/paper execution adapter.

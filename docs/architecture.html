@@ -156,7 +156,8 @@
 
           <!-- row 1: data sources -->
           <rect class="node" x="250" y="26" width="180" height="46" rx="9"/>
-          <text class="lbl big" x="340" y="54" text-anchor="middle">OANDA v20</text>
+          <text class="lbl big" x="340" y="50" text-anchor="middle" font-size="13">OANDA · Alpaca</text>
+          <text class="lbl sm mut" x="340" y="64" text-anchor="middle" font-size="9">forex · stocks · crypto</text>
           <rect class="node" x="530" y="26" width="180" height="46" rx="9"/>
           <text class="lbl big" x="620" y="54" text-anchor="middle">CSV / offline</text>
           <text class="etxt" x="480" y="18" text-anchor="middle">data sources</text>
@@ -442,6 +443,14 @@
         opposite bound. Community-attributed, not ICT-original; included for
         disambiguation.</p>
         <code>sweep HTF bound → opposite bound</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>mtf</h3><span class="mod">mtf.py</span> <span class="tag state">top-down</span></div>
+        <p>Resamples the entry TF up to H1/H4/D and reads each one's bias, then
+        aggregates a single HTF direction that filters the scanner — longs on
+        bullish, shorts on bearish.</p>
+        <code>resample → per-TF bias → aggregate</code>
       </div>
 
       <div class="card">
