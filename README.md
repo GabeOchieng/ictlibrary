@@ -1,0 +1,154 @@
+# ictlib — an ICT concept-detection library
+
+A clean, tested, dependency-light Python library that detects the core
+**Inner Circle Trader (ICT)** price-action concepts from OHLCV candles, and
+renders them on an annotated chart. It is the foundation the higher-level tools
+— a signal **scanner** (included), a backtester, or a live bot — all build on.
+
+Every detector is grounded in the concept definitions from the
+[ict-knowledge-library](https://github.com/SrsBlack/ict-knowledge-library):
+the formulas in that wiki are reproduced verbatim in each module's docstring.
+
+> ⚠️ Educational tool. Nothing here is financial advice. ICT concepts are
+> discretionary ideas; detection thresholds are quantified approximations.
+
+---
+
+## What it detects
+
+| Concept | Module | Rule (from the knowledge library) |
+|---|---|---|
+| **Swing highs/lows** | `concepts/structure.py` | n-bar fractal: `H_n > H_{n±1..w}` |
+| **BOS / CHoCH** | `concepts/structure.py` | close beyond last opposite swing; continuation vs first reversal |
+| **MSS** | `concepts/structure.py` | a CHoCH **with displacement + FVG in the break** |
+| **Displacement** | `concepts/displacement.py` | `body ≥ 1.5×avg`, `body/range ≥ 0.70`, `opp_wick/range ≤ 0.20` |
+| **Fair Value Gap** | `concepts/fvg.py` | bull `L_{n+1} > H_{n-1}`, bear `H_{n+1} < L_{n-1}`; CE = midpoint |
+| **Order Block** | `concepts/order_blocks.py` | last opposite candle before a structure-breaking displacement; body = MT zone |
+| **Liquidity pools** | `concepts/liquidity.py` | BSL/SSL at swings; EQH/EQL clusters within a pip tolerance |
+| **Liquidity sweep** | `concepts/liquidity.py` | wick beyond pool + close back inside + ≥60% wick |
+| **Killzones** | `concepts/killzones.py` | NY-time windows (Asia, London, NY AM/PM) + silver bullet, DST-aware |
+| **OTE** | `concepts/ote.py` | 0.62–0.79 retracement band of a measured leg |
+
+Each detector marks **state** where the concept has it: FVGs and order blocks
+track whether they are still *unmitigated*; pools track whether they've been *swept*.
+
+---
+
+## Install & run
+
+```bash
+pip install -r requirements.txt        # only 'requests' (OANDA) + pytest are needed
+python -m pytest                        # 22 tests, all green
+
+# generate the offline sample and scan it (no API key required)
+python examples/generate_sample.py
+python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv
+
+# render the annotated chart (self-contained HTML, opens in any browser)
+python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv --html chart.html
+
+# emit JSON for downstream tooling
+python -m ictlib.cli --csv sample_data/EUR_USD_M15.csv --json
+```
+
+### Live forex via OANDA
+
+```bash
+export OANDA_API_KEY="your-token"
+export OANDA_ENV="practice"      # or "live"
+python -m ictlib.cli --oanda --instrument EUR_USD --granularity M15 --count 300 --html eurusd.html
+```
+
+---
+
+## Library API
+
+```python
+from ictlib import analyze, scan
+from ictlib.data import load_csv          # or: from ictlib.data import OandaClient
+
+candles = load_csv("sample_data/EUR_USD_M15.csv")
+
+a = analyze(candles)                       # one snapshot with every primitive
+print(a.summary())                         # bias, killzone, counts
+a.swings, a.events, a.fvgs, a.order_blocks, a.pools, a.sweeps
+a.unmitigated_fvgs, a.unmitigated_obs, a.open_pools
+
+for sig in scan(a):                        # signals built on the primitives
+    print(sig.direction, sig.entry, sig.stop, sig.targets, sig.score)
+    print(sig.reasons)                     # the confluence that fired
+
+from ictlib.viz import render_html
+render_html(a, "chart.html", instrument="EUR_USD", signals=scan(a))
+```
+
+Everything is a plain dataclass and JSON-serialisable via `ictlib.to_jsonable`.
+
+---
+
+## The scanner setup (v1)
+
+The included scanner encodes the classic ICT reversal:
+
+1. A **liquidity sweep** runs a pool of stops beyond a high/low.
+2. An **MSS** (displaced CHoCH leaving an FVG) fires the *other* way — the
+   algorithm's signature to reverse.
+3. **Entry** = the FVG left by that MSS (consequent encroachment) or the order
+   block behind it (mean threshold).
+4. **Stop** beyond the sweep extreme; **targets** = the opposite liquidity
+   pools (the draw on liquidity), nearest first.
+
+Confluences add to a score: active killzone, HTF bias aligned, entry inside the
+OTE band, and whether a dense EQH/EQL pool was the one swept.
+
+---
+
+## Architecture
+
+```
+                 data (OANDA / CSV)  ->  List[Candle]
+                                             |
+             ┌───────────────────────────────┴───────────────────────────────┐
+             |                     concepts/  (pure primitives)               |
+             |  structure · displacement · fvg · order_blocks · liquidity     |
+             |  killzones · ote                                               |
+             └───────────────────────────────┬───────────────────────────────┘
+                                              |
+                        analyze()  ->  Analysis  (one snapshot of all primitives)
+                                              |
+                     ┌────────────────────────┼────────────────────────┐
+                     |                         |                        |
+                 scan() -> Signal        viz.render_html()        (backtester /
+              (confluence scoring)     annotated HTML chart        live bot — next)
+```
+
+The primitive layer never imports the scanner or the visualiser, so a
+backtester or a live bot can sit beside the scanner on the same `Analysis`
+object without duplicating any detection logic.
+
+---
+
+## Layout
+
+```
+ictlib/
+  models.py            Candle + every primitive as a typed dataclass
+  analysis.py          analyze() -> Analysis snapshot
+  scanner.py           scan() -> signals (sweep -> MSS -> FVG/OB)
+  viz.py               render_html() self-contained annotated chart
+  cli.py               python -m ictlib.cli
+  sample_setups.py     canonical hand-authored setups (shared by demo + tests)
+  concepts/            structure, displacement, fvg, order_blocks,
+                       liquidity, killzones, ote
+  data/                oanda.py (v20 REST), csv_loader.py
+examples/              generate_sample.py, rendered chart
+sample_data/           EUR_USD_M15.csv
+tests/                 22 deterministic tests
+```
+
+## Roadmap
+
+- Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
+- Backtester on top of `scan()` with equity curve + R distribution.
+- More setups: Silver Bullet, Judas Swing, Turtle Soup, OTE-continuation.
+- Live/paper execution adapter for OANDA.

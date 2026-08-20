@@ -1,0 +1,363 @@
+"""Visualisation: render a candle series + all detected ICT primitives as a
+self-contained, theme-aware HTML candlestick chart (inline SVG, no external
+dependencies — it opens in any browser and works as a Claude Artifact).
+
+Each primitive becomes a toggleable overlay layer:
+    candles · swings · FVGs · order blocks · liquidity pools · sweeps ·
+    structure (BOS/CHoCH/MSS) · signals
+"""
+
+from __future__ import annotations
+
+import html
+from datetime import timezone
+from typing import List, Optional
+
+from .analysis import Analysis
+from .models import Signal
+
+
+# palette (works on both themes; backgrounds are theme-swapped in CSS)
+C_BULL = "#26a69a"
+C_BEAR = "#ef5350"
+C_OB_BULL = "#2962ff"
+C_OB_BEAR = "#ff9800"
+C_SWEEP = "#ab47bc"
+C_BOS = "#8e9aa6"
+C_CHOCH = "#ff9800"
+C_MSS = "#ffca28"
+C_ENTRY = "#ffca28"
+
+
+def _fmt_price(v: float) -> str:
+    return f"{v:.5f}"
+
+
+def render_html(
+    analysis: Analysis,
+    path: str,
+    *,
+    title: str = "ICT Concept Map",
+    instrument: str = "",
+    granularity: str = "",
+    signals: Optional[List[Signal]] = None,
+    max_candles: int = 220,
+) -> str:
+    """Render ``analysis`` to a standalone HTML file at ``path``. Returns path."""
+    candles = analysis.candles
+    if not candles:
+        raise ValueError("no candles to render")
+
+    # window to the last ``max_candles`` bars but keep original indices
+    start = max(0, len(candles) - max_candles)
+    view = list(range(start, len(candles)))
+
+    # ---- geometry -------------------------------------------------------- #
+    slot = 9.0
+    mL, mR, mT, mB = 8.0, 78.0, 14.0, 30.0
+    plot_w = len(view) * slot
+    W = plot_w + mL + mR
+    H = 600.0
+    plot_h = H - mT - mB
+
+    lows = [candles[i].low for i in view]
+    highs = [candles[i].high for i in view]
+    extra = [p.price for p in analysis.pools]
+    if signals:
+        for s in signals:
+            extra += [s.entry, s.stop, *s.targets, *s.entry_zone]
+    pmin = min(lows + extra) if extra else min(lows)
+    pmax = max(highs + extra) if extra else max(highs)
+    pad = (pmax - pmin) * 0.06 or (pmax * 0.001)
+    pmin -= pad
+    pmax += pad
+
+    def x_of(idx: int) -> float:
+        return mL + (idx - start) * slot + slot / 2.0
+
+    def y_of(price: float) -> float:
+        return mT + (pmax - price) / (pmax - pmin) * plot_h
+
+    def right_edge() -> float:
+        return mL + plot_w
+
+    parts: List[str] = []
+    parts.append(f'<svg viewBox="0 0 {W:.0f} {H:.0f}" '
+                 f'preserveAspectRatio="xMinYMid meet" class="chart" '
+                 f'role="img" aria-label="{html.escape(title)}">')
+
+    # ---- price grid ------------------------------------------------------ #
+    parts.append('<g class="grid">')
+    for k in range(7):
+        p = pmin + (pmax - pmin) * k / 6
+        y = y_of(p)
+        parts.append(f'<line x1="{mL:.1f}" y1="{y:.1f}" x2="{right_edge():.1f}" '
+                     f'y2="{y:.1f}" class="gridline"/>')
+        parts.append(f'<text x="{right_edge()+4:.1f}" y="{y+3:.1f}" '
+                     f'class="axis">{_fmt_price(p)}</text>')
+    # sparse time axis — keep labels at least ~5 slots apart so they never collide
+    n = len(view)
+    step = max(n // 8, int(46 / slot) + 1, 1)
+    for k in range(0, n, step):
+        idx = view[k]
+        t = candles[idx].ts.astimezone(timezone.utc)
+        parts.append(f'<text x="{x_of(idx):.1f}" y="{H-8:.1f}" '
+                     f'class="axis time" text-anchor="middle">'
+                     f'{t.strftime("%m-%d %H:%M")}</text>')
+    parts.append('</g>')
+
+    # ---- liquidity pools (draw first, behind candles) ------------------- #
+    parts.append('<g data-layer="pools">')
+    for p in analysis.pools:
+        if p.index < start:
+            xs = mL
+        else:
+            xs = x_of(p.index)
+        y = y_of(p.price)
+        col = C_BEAR if p.kind == "BSL" else C_BULL
+        is_eq = p.label in ("EQH", "EQL")
+        wdt = 1.6 if is_eq else 0.9
+        dash = "1 0" if is_eq else "4 3"
+        cls = "swept" if p.swept else ""
+        tag = p.label if is_eq else p.kind  # EQH/EQL, else BSL/SSL
+        parts.append(f'<line class="pool {cls}" x1="{xs:.1f}" y1="{y:.1f}" '
+                     f'x2="{right_edge():.1f}" y2="{y:.1f}" stroke="{col}" '
+                     f'stroke-width="{wdt}" stroke-dasharray="{dash}"/>')
+        # tag sits at the pool's origin (left) so it never collides with the axis
+        parts.append(f'<text x="{xs+3:.1f}" y="{y-2:.1f}" '
+                     f'class="tag" fill="{col}">{tag}</text>')
+    parts.append('</g>')
+
+    # ---- FVGs ------------------------------------------------------------ #
+    parts.append('<g data-layer="fvg">')
+    for f in analysis.fvgs:
+        x1 = x_of(max(f.index - 1, start))
+        end_idx = f.mitigated_index if f.mitigated_index else len(candles) - 1
+        x2 = x_of(min(end_idx, len(candles) - 1))
+        yt, yb = y_of(f.high), y_of(f.low)
+        col = C_BULL if f.direction == "bull" else C_BEAR
+        op = 0.09 if f.mitigated else 0.20
+        parts.append(f'<rect class="fvg" x="{x1:.1f}" y="{yt:.1f}" '
+                     f'width="{max(x2-x1,slot):.1f}" height="{max(yb-yt,1):.1f}" '
+                     f'fill="{col}" fill-opacity="{op}" stroke="{col}" '
+                     f'stroke-opacity="0.5" stroke-dasharray="3 2">'
+                     f'<title>{f.direction} FVG {_fmt_price(f.low)}-'
+                     f'{_fmt_price(f.high)} CE {_fmt_price(f.ce)}'
+                     f'{" (mitigated)" if f.mitigated else ""}</title></rect>')
+    parts.append('</g>')
+
+    # ---- order blocks ---------------------------------------------------- #
+    parts.append('<g data-layer="ob">')
+    for o in analysis.order_blocks:
+        x1 = x_of(o.index)
+        end_idx = o.mitigated_index if o.mitigated_index else len(candles) - 1
+        x2 = x_of(min(end_idx, len(candles) - 1))
+        yt, yb = y_of(o.high), y_of(o.low)
+        col = C_OB_BULL if o.direction == "bull" else C_OB_BEAR
+        op = 0.08 if o.mitigated else 0.16
+        parts.append(f'<rect class="ob" x="{x1:.1f}" y="{yt:.1f}" '
+                     f'width="{max(x2-x1,slot):.1f}" height="{max(yb-yt,1):.1f}" '
+                     f'fill="{col}" fill-opacity="{op}" stroke="{col}" '
+                     f'stroke-opacity="0.6">'
+                     f'<title>{o.direction} OB {_fmt_price(o.low)}-'
+                     f'{_fmt_price(o.high)} MT {_fmt_price(o.mt)}'
+                     f'{" (mitigated)" if o.mitigated else ""}</title></rect>')
+    parts.append('</g>')
+
+    # ---- candles --------------------------------------------------------- #
+    parts.append('<g data-layer="candles">')
+    bw = slot * 0.62
+    for idx in view:
+        c = candles[idx]
+        x = x_of(idx)
+        col = C_BULL if c.close >= c.open else C_BEAR
+        parts.append(f'<line x1="{x:.1f}" y1="{y_of(c.high):.1f}" x2="{x:.1f}" '
+                     f'y2="{y_of(c.low):.1f}" stroke="{col}" stroke-width="1"/>')
+        yo, yc = y_of(c.open), y_of(c.close)
+        yt = min(yo, yc)
+        hgt = max(abs(yc - yo), 0.8)
+        parts.append(f'<rect x="{x-bw/2:.1f}" y="{yt:.1f}" width="{bw:.1f}" '
+                     f'height="{hgt:.1f}" fill="{col}">'
+                     f'<title>{c.ts.strftime("%Y-%m-%d %H:%M")} UTC  '
+                     f'O {_fmt_price(c.open)} H {_fmt_price(c.high)} '
+                     f'L {_fmt_price(c.low)} C {_fmt_price(c.close)}</title></rect>')
+    parts.append('</g>')
+
+    # ---- swings ---------------------------------------------------------- #
+    parts.append('<g data-layer="swings">')
+    for s in analysis.swings:
+        if s.index < start:
+            continue
+        x, y = x_of(s.index), y_of(s.price)
+        col = C_BEAR if s.kind == "high" else C_BULL
+        dy = -5 if s.kind == "high" else 5
+        parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.4" fill="{col}">'
+                     f'<title>swing {s.kind} {_fmt_price(s.price)}</title></circle>')
+    parts.append('</g>')
+
+    # ---- sweeps ---------------------------------------------------------- #
+    parts.append('<g data-layer="sweeps">')
+    for sw in analysis.sweeps:
+        if sw.index < start:
+            continue
+        x, y = x_of(sw.index), y_of(sw.extreme)
+        up = sw.kind == "BSL"
+        tip = y - 8 if up else y + 8
+        parts.append(f'<path d="M{x-4:.1f},{y:.1f} L{x+4:.1f},{y:.1f} '
+                     f'L{x:.1f},{tip:.1f} Z" fill="{C_SWEEP}">'
+                     f'<title>{sw.kind} sweep of {_fmt_price(sw.level)} '
+                     f'(wick {sw.wick_pct*100:.0f}%)</title></path>')
+    parts.append('</g>')
+
+    # ---- structure events ------------------------------------------------ #
+    parts.append('<g data-layer="structure">')
+    for ev in analysis.events:
+        if ev.index < start:
+            continue
+        x = x_of(ev.index)
+        y = y_of(ev.level)
+        col = {"BOS": C_BOS, "CHoCH": C_CHOCH, "MSS": C_MSS}[ev.kind]
+        parts.append(f'<line x1="{x:.1f}" y1="{mT:.1f}" x2="{x:.1f}" '
+                     f'y2="{H-mB:.1f}" stroke="{col}" stroke-width="0.7" '
+                     f'stroke-opacity="0.5" stroke-dasharray="2 3"/>')
+        parts.append(f'<text x="{x:.1f}" y="{mT+10:.1f}" class="ev" '
+                     f'fill="{col}" text-anchor="middle">{ev.kind}</text>'
+                     f'<title>{ev.kind} {ev.direction} @ {_fmt_price(ev.level)}</title>')
+    parts.append('</g>')
+
+    # ---- signals --------------------------------------------------------- #
+    parts.append('<g data-layer="signals">')
+    for s in (signals or []):
+        x = x_of(s.index)
+        zt, zb = y_of(max(s.entry_zone)), y_of(min(s.entry_zone))
+        parts.append(f'<rect x="{x:.1f}" y="{zt:.1f}" width="{right_edge()-x:.1f}" '
+                     f'height="{max(zb-zt,1):.1f}" fill="{C_ENTRY}" '
+                     f'fill-opacity="0.12"/>')
+        for price, col, lab in ((s.entry, C_ENTRY, "entry"),
+                                (s.stop, C_BEAR, "stop"),
+                                *[(t, C_BULL, "target") for t in s.targets]):
+            yy = y_of(price)
+            parts.append(f'<line x1="{x:.1f}" y1="{yy:.1f}" x2="{right_edge():.1f}" '
+                         f'y2="{yy:.1f}" stroke="{col}" stroke-width="1.1" '
+                         f'stroke-dasharray="5 3"/>')
+        arrow = "▲" if s.direction == "long" else "▼"
+        parts.append(f'<text x="{x+3:.1f}" y="{zt-3:.1f}" class="sig" '
+                     f'fill="{C_ENTRY}">{arrow} {s.direction.upper()} '
+                     f'score {s.score}</text>')
+    parts.append('</g>')
+
+    parts.append('</svg>')
+    svg = "\n".join(parts)
+
+    # ---- legend + summary ----------------------------------------------- #
+    layers = [
+        ("candles", "Candles", "var(--fg)"),
+        ("swings", "Swings", C_BULL),
+        ("structure", "BOS / CHoCH / MSS", C_MSS),
+        ("fvg", "Fair Value Gaps", C_BULL),
+        ("ob", "Order Blocks", C_OB_BULL),
+        ("pools", "Liquidity Pools", C_BEAR),
+        ("sweeps", "Sweeps", C_SWEEP),
+        ("signals", "Signals", C_ENTRY),
+    ]
+    legend = "".join(
+        f'<label class="leg"><input type="checkbox" checked data-toggle="{lid}">'
+        f'<span class="dot" style="background:{col}"></span>{name}</label>'
+        for lid, name, col in layers
+    )
+
+    su = analysis.summary()
+    head = " · ".join([
+        f'<b>{html.escape(instrument or "series")}</b>',
+        html.escape(granularity) if granularity else "",
+        f'bias <b>{su["bias"]}</b>',
+        f'killzone <b>{su["killzone"] or "—"}</b>',
+        f'{su["candles"]} bars',
+    ])
+    stats = " · ".join([
+        f'{su["structure_events"]} structure',
+        f'{su["unmitigated_fvgs"]}/{su["fvgs"]} FVG open',
+        f'{su["unmitigated_obs"]}/{su["order_blocks"]} OB open',
+        f'{su["sweeps"]} sweeps',
+        f'{len(signals or [])} signals',
+    ])
+
+    doc = _PAGE.format(
+        title=html.escape(title),
+        head=head,
+        stats=stats,
+        legend=legend,
+        svg=svg,
+    )
+    with open(path, "w") as fh:
+        fh.write(doc)
+    return path
+
+
+_PAGE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<style>
+  :root {{
+    --bg:#f7f8fa; --panel:#ffffff; --fg:#1a2027; --muted:#5b6672;
+    --line:#e3e7ec; --border:#d7dde3;
+  }}
+  @media (prefers-color-scheme: dark) {{
+    :root:not([data-theme="light"]) {{
+      --bg:#0e1116; --panel:#161b22; --fg:#e6edf3; --muted:#8b949e;
+      --line:#222c37; --border:#2a333d;
+    }}
+  }}
+  :root[data-theme="dark"] {{
+    --bg:#0e1116; --panel:#161b22; --fg:#e6edf3; --muted:#8b949e;
+    --line:#222c37; --border:#2a333d;
+  }}
+  * {{ box-sizing:border-box; }}
+  body {{ margin:0; background:var(--bg); color:var(--fg);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }}
+  header {{ padding:14px 18px 6px; }}
+  h1 {{ font-size:15px; margin:0 0 4px; font-weight:600; }}
+  .sub {{ color:var(--muted); font-size:13px; }}
+  .stats {{ color:var(--muted); font-size:12px; margin-top:2px; }}
+  .legend {{ display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 18px 12px; }}
+  .leg {{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px;
+    color:var(--fg); cursor:pointer; user-select:none; }}
+  .leg input {{ accent-color:#2962ff; }}
+  .dot {{ width:11px; height:11px; border-radius:2px; display:inline-block; }}
+  .wrap {{ overflow-x:auto; padding:0 10px 18px; }}
+  svg.chart {{ width:100%; min-width:760px; height:auto;
+    background:var(--panel); border:1px solid var(--border); border-radius:8px; }}
+  .gridline {{ stroke:var(--line); stroke-width:0.6; }}
+  text.axis {{ fill:var(--muted); font-size:9px; }}
+  text.tag {{ font-size:8.5px; font-weight:600; }}
+  text.ev {{ font-size:8px; font-weight:700; }}
+  text.sig {{ font-size:10px; font-weight:700; }}
+  .pool.swept {{ stroke-opacity:0.35; }}
+  footer {{ color:var(--muted); font-size:11px; padding:0 18px 20px; }}
+  code {{ background:var(--line); padding:1px 4px; border-radius:3px; }}
+</style>
+</head>
+<body>
+<header>
+  <h1>{title}</h1>
+  <div class="sub">{head}</div>
+  <div class="stats">{stats}</div>
+</header>
+<div class="legend">{legend}</div>
+<div class="wrap">{svg}</div>
+<footer>ICT primitives detected by <code>ictlib</code>. Hover any element for
+details · toggle layers above. Educational tool — not financial advice.</footer>
+<script>
+  document.querySelectorAll('input[data-toggle]').forEach(function(cb){{
+    cb.addEventListener('change', function(){{
+      var g = document.querySelector('[data-layer="'+cb.dataset.toggle+'"]');
+      if (g) g.style.display = cb.checked ? '' : 'none';
+    }});
+  }});
+</script>
+</body>
+</html>
+"""

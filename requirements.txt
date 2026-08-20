@@ -1,0 +1,8 @@
+# Core library (concepts, analysis, scanner, viz) uses only the Python
+# standard library — nothing here is required to detect concepts or render charts.
+
+# Optional: live/practice forex data from OANDA (ictlib.data.oanda)
+requests>=2.28
+
+# Dev / tests
+pytest>=7.0
