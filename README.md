@@ -39,6 +39,7 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 | **Quarterly Theory / PO3** | `concepts/quarterly.py` | True Day Open, daily quarters → AMD phases |
 | **CRT** *(community)* | `concepts/crt.py` | HTF candle-range sweep → opposite bound (non-ICT-original) |
 | **HTF bias (multi-TF)** | `mtf.py` | top-down bias across resampled H1/H4/D; drives setup side |
+| **Named models** | `setups.py` | 2022 Model, Silver Bullet, Judas Swing, Unicorn (composed) |
 | **OTE** | `concepts/ote.py` | 0.62–0.79 retracement band of a measured leg |
 
 Each detector marks **state** where the concept has it: FVGs and order blocks
@@ -138,6 +139,11 @@ OTE band, whether a dense EQH/EQL pool was the one swept, and — per ICT's
 premium/discount discipline — whether the entry sits on the correct side of the
 dealing-range equilibrium (longs at a discount, shorts at a premium). Entries on
 the wrong side of EQ are flagged rather than silently scored.
+
+Each signal is also **classified into named ICT models** (`setups.py`) it
+satisfies — *ICT 2022 Model*, *Silver Bullet*, *Judas Swing* — and a *Unicorn*
+zone (breaker + nested FVG + HTF bias + prior sweep) overlapping the entry adds
+conviction. `signal.models` carries the matched names.
 
 ---
 
