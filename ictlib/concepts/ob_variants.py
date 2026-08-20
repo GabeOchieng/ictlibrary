@@ -36,3 +36,22 @@ def find_propulsion_blocks(
             seen.add(j)
             out.append(PropulsionBlock(j, c.ts, ob.direction, c.body_low, c.body_high))
     return out
+
+
+def find_reclaimed_obs(candles: List[Candle], order_blocks: List[OrderBlock]) -> List[OrderBlock]:
+    """Mitigated OBs that price returned to a SECOND time and respected again
+    (concepts/07-order-blocks/reclaimed-order-block) — an old block reused."""
+    out: List[OrderBlock] = []
+    for ob in order_blocks:
+        if not ob.mitigated or ob.mitigated_index is None:
+            continue
+        # a later re-touch of the body after the first mitigation
+        for i in range(ob.mitigated_index + 1, len(candles)):
+            c = candles[i]
+            touched = (ob.direction == "bull" and c.low <= ob.high) or \
+                      (ob.direction == "bear" and c.high >= ob.low)
+            if touched:
+                out.append(ob)
+                break
+    return out
+

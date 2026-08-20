@@ -21,7 +21,7 @@ from typing import List, Optional
 from .models import Signal, Sweep
 from .analysis import Analysis, analyze
 from .concepts.killzones import active_killzone, in_silver_bullet
-from .concepts.ote import ote_from_leg, sd_projections, SD_OTE
+from .concepts.ote import ote_from_leg, sd_projections, SD_OTE, measured_leg
 from .setups import classify_models
 
 
@@ -181,12 +181,9 @@ def _targets(analysis, kind, entry, sweep, mss, leg_dir, use_sd, *, limit=4):
     if use_sd:
         candles = analysis.candles
         end = min(mss.index + 2, len(candles) - 1)
-        seg = candles[sweep.index:end + 1] or [candles[sweep.index]]
-        if leg_dir == "bull":
-            leg_end = max(c.high for c in seg)
-        else:
-            leg_end = min(c.low for c in seg)
-        for price in sd_projections(sweep.extreme, leg_end).values():
+        # body-anchored measured leg (concepts/28/fib-anchoring)
+        leg_start, leg_end = measured_leg(candles, sweep.index, end, leg_dir, "body")
+        for price in sd_projections(leg_start, leg_end).values():
             if (price > entry) == (leg_dir == "bull"):
                 levels.append(price)
     if leg_dir == "bull":
@@ -304,6 +301,12 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
            for u in analysis.unicorns):
         reasons.append("Unicorn A+ zone at entry (breaker + nested FVG)")
         score += 2
+
+    # Stop-run classification (concepts/29-stop-runs): name the PD array the
+    # sweep ran into.
+    sr = next((r for r in analysis.stop_runs if r["sweep_index"] == sweep.index), None)
+    if sr is not None:
+        reasons.append(f"stop-run into {sr['into']}")
 
     # SMT divergence confirmation (intermarket / correlated pair).
     if any(d.direction == want_dir2 for d in analysis.smt_divergences[-3:]):

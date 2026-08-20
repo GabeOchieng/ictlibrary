@@ -29,7 +29,7 @@ from .concepts import (
     find_inversion_fvgs, find_bpr, find_nested_fvgs,
     find_propulsion_blocks, find_liquidity_voids,
     classify_internal_external, range_state,
-    find_ndog, find_nwog,
+    find_ndog, find_nwog, find_reclaimed_obs, classify_stop_runs,
 )
 
 
@@ -60,6 +60,8 @@ class Analysis:
     liquidity_voids: List[LiquidityVoid] = field(default_factory=list)
     propulsion_blocks: List[PropulsionBlock] = field(default_factory=list)
     range_state: str = "unknown"
+    reclaimed_obs: List[OrderBlock] = field(default_factory=list)
+    stop_runs: list = field(default_factory=list)
     smt_divergences: List[SMTDivergence] = field(default_factory=list)
     news_blackout: Optional[NewsEvent] = None
     ndog: Optional[OpeningGap] = None
@@ -147,6 +149,8 @@ class Analysis:
             "news_blackout": self.news_blackout.name if self.news_blackout else None,
             "ndog": bool(self.ndog),
             "nwog": bool(self.nwog),
+            "reclaimed_obs": len(self.reclaimed_obs),
+            "stop_runs": len(self.stop_runs),
         }
 
 
@@ -198,6 +202,7 @@ def analyze(
     nested = find_nested_fvgs(fvgs)
     voids = find_liquidity_voids(candles)
     propulsion = find_propulsion_blocks(candles, obs)
+    reclaimed = find_reclaimed_obs(candles, obs)
     rstate = range_state(candles)
 
     smt = []
@@ -249,6 +254,7 @@ def analyze(
         liquidity_voids=voids,
         propulsion_blocks=propulsion,
         range_state=rstate,
+        reclaimed_obs=reclaimed,
         smt_divergences=smt,
         news_blackout=blackout,
         ndog=ndog,
@@ -257,7 +263,8 @@ def analyze(
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,
     )
-    # Unicorns depend on breakers + fvgs + bias, so classify once the snapshot exists.
+    # These depend on the assembled snapshot, so classify once it exists.
     from .setups import find_unicorns
     result.unicorns = find_unicorns(result)
+    result.stop_runs = classify_stop_runs(result)
     return result

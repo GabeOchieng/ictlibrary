@@ -48,6 +48,26 @@ SD_OTE = (-0.5, -1.0, -1.5, -2.0)
 SD_WIDE = (-1.5, -2.0, -2.5, -4.0)
 
 
+def measured_leg(candles, start_i: int, end_i: int, direction: str,
+                 anchor: str = "body") -> tuple:
+    """The (leg_start, leg_end) for a measured leg (concepts/28/fib-anchoring).
+
+    ICT anchors fibs to candle BODIES, not wicks — wicks differ most between
+    brokers, so a wick-anchored measurement is not reproducible. PD arrays keep
+    their own wick conventions; this governs the fib tool only.
+    """
+    seg = candles[start_i:end_i + 1] or [candles[start_i]]
+    if anchor == "body":
+        highs = [c.body_high for c in seg]
+        lows = [c.body_low for c in seg]
+    else:
+        highs = [c.high for c in seg]
+        lows = [c.low for c in seg]
+    if direction == "bull":
+        return min(lows), max(highs)
+    return max(highs), min(lows)
+
+
 def sd_projections(leg_start: float, leg_end: float, levels=SD_OTE) -> dict:
     """Extension targets beyond a measured leg: project(level) = leg_end -
     level*leg_size, with negative levels extending past leg_end."""

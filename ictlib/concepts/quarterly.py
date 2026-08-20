@@ -62,6 +62,20 @@ def quarterly_context(candles: List[Candle]) -> QuarterlyContext:
     )
 
 
+def ninety_minute_cycle(ts: datetime) -> Tuple[int, str, str]:
+    """The 90-minute micro-cycle and its 22.5-min mini-quarter AMD phase
+    (concepts/04-time-cycles/90-minute-cycle). Cycles are NY-time anchored to
+    the 6-hour session quarters; each splits into four 22.5-min mini-quarters."""
+    m = ny_minutes(ts)
+    q_start = (int(m) // 360) * 360          # 6-hour session quarter start
+    into_q = m - q_start
+    cycle = int(into_q // 90) + 1            # which 90-min cycle (1..4)
+    into_cycle = into_q - (cycle - 1) * 90
+    mini = int(into_cycle // 22.5) + 1       # which 22.5-min mini-quarter (1..4)
+    phase = ["accumulation", "manipulation", "distribution", "continuation/reversal"][mini - 1]
+    return cycle, f"Q{mini}", phase
+
+
 def po3_phase(candles: List[Candle]) -> Optional[str]:
     """The current Power-of-Three phase, via the Quarterly-Theory time mapping."""
     if not candles:
