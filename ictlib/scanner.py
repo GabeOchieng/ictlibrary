@@ -187,4 +187,16 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
         elif side != "equilibrium":
             reasons.append(f"⚠ entry at {side} for a {direction} — against PD discipline")
 
+    # Stacked imbalance: a volume imbalance or breaker overlapping the entry zone
+    # adds conviction (concepts/06-fair-value-gaps/volume-imbalance, 08-breaker-blocks).
+    want_dir = "bull" if direction == "long" else "bear"
+    if any(vi.direction == want_dir and vi.low <= entry <= vi.high
+           for vi in analysis.volume_imbalances):
+        reasons.append("stacked volume imbalance at entry")
+        score += 1
+    if any(b.direction == want_dir and b.low <= entry <= b.high
+           for b in analysis.breakers):
+        reasons.append("breaker block confluence at entry")
+        score += 1
+
     return reasons, score

@@ -13,12 +13,13 @@ from typing import List, Optional
 
 from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
-    DealingRange,
+    DealingRange, Breaker, RejectionBlock, VolumeImbalance,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
     find_fvgs, find_order_blocks, find_pools, find_sweeps, infer_pip_size,
     active_killzone, find_dealing_range,
+    find_breakers, find_rejection_blocks, find_volume_imbalances,
 )
 
 
@@ -32,6 +33,9 @@ class Analysis:
     order_blocks: List[OrderBlock] = field(default_factory=list)
     pools: List[LiquidityPool] = field(default_factory=list)
     sweeps: List[Sweep] = field(default_factory=list)
+    breakers: List[Breaker] = field(default_factory=list)
+    rejection_blocks: List[RejectionBlock] = field(default_factory=list)
+    volume_imbalances: List[VolumeImbalance] = field(default_factory=list)
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -72,6 +76,9 @@ class Analysis:
             "unmitigated_obs": len(self.unmitigated_obs),
             "liquidity_pools": len(self.pools),
             "sweeps": len(self.sweeps),
+            "breakers": len(self.breakers),
+            "rejection_blocks": len(self.rejection_blocks),
+            "volume_imbalances": len(self.volume_imbalances),
         }
 
 
@@ -93,6 +100,11 @@ def analyze(
     pools = find_pools(swings, pip=pip, eq_tolerance_pips=eq_tolerance_pips)
     sweeps = find_sweeps(candles, pools)
     drange = find_dealing_range(candles, swings)
+    breakers = find_breakers(candles, obs)
+    # rejection blocks are only meaningful at known levels: swings + pool prices
+    key_levels = [s.price for s in swings] + [p.price for p in pools]
+    rbs = find_rejection_blocks(candles, key_levels=key_levels, tol=3 * pip)
+    vis = find_volume_imbalances(candles, min_size=pip)
 
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
@@ -100,6 +112,12 @@ def analyze(
             f.pd_side = drange.classify(f.ce)
         for o in obs:
             o.pd_side = drange.classify(o.mt)
+        for b in breakers:
+            b.pd_side = drange.classify(b.mt)
+        for rb in rbs:
+            rb.pd_side = drange.classify((rb.low + rb.high) / 2)
+        for vi in vis:
+            vi.pd_side = drange.classify(vi.ce)
 
     return Analysis(
         candles=candles,
@@ -110,6 +128,9 @@ def analyze(
         order_blocks=obs,
         pools=pools,
         sweeps=sweeps,
+        breakers=breakers,
+        rejection_blocks=rbs,
+        volume_imbalances=vis,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

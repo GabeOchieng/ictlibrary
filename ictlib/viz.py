@@ -194,6 +194,55 @@ def render_html(
                      f'{" (mitigated)" if o.mitigated else ""}</title></rect>')
     parts.append('</g>')
 
+    # ---- breaker blocks (flipped OBs) ----------------------------------- #
+    parts.append('<g data-layer="breakers">')
+    for b in analysis.breakers:
+        x1 = x_of(b.break_index)
+        end_idx = b.retested_index if b.retested_index else len(candles) - 1
+        x2 = x_of(min(end_idx, len(candles) - 1))
+        yt, yb = y_of(b.high), y_of(b.low)
+        col = C_BULL if b.direction == "bull" else C_BEAR
+        parts.append(f'<rect class="brk" x="{x1:.1f}" y="{yt:.1f}" '
+                     f'width="{max(x2-x1,slot):.1f}" height="{max(yb-yt,1):.1f}" '
+                     f'fill="{col}" fill-opacity="0.10" stroke="{col}" '
+                     f'stroke-width="1.3" stroke-dasharray="2 2">'
+                     f'<title>{b.direction} breaker {_fmt_price(b.low)}-'
+                     f'{_fmt_price(b.high)} (flipped OB)</title></rect>')
+        parts.append(f'<text x="{x1+2:.1f}" y="{yt-2:.1f}" class="tag" '
+                     f'fill="{col}">BRK</text>')
+    parts.append('</g>')
+
+    # ---- rejection blocks (wick zones) ---------------------------------- #
+    parts.append('<g data-layer="rejection">')
+    for rb in analysis.rejection_blocks:
+        if rb.index < start:
+            continue
+        x = x_of(rb.index)
+        yt, yb = y_of(rb.high), y_of(rb.low)
+        col = C_BULL if rb.direction == "bull" else C_BEAR
+        parts.append(f'<rect x="{x-slot*0.55:.1f}" y="{yt:.1f}" '
+                     f'width="{slot*1.1:.1f}" height="{max(yb-yt,1):.1f}" '
+                     f'fill="{col}" fill-opacity="0.22" stroke="{col}" '
+                     f'stroke-opacity="0.7" stroke-width="0.8">'
+                     f'<title>{rb.direction} rejection block '
+                     f'(wick {rb.wick_pct*100:.0f}%)</title></rect>')
+    parts.append('</g>')
+
+    # ---- volume imbalances (body gaps) ---------------------------------- #
+    parts.append('<g data-layer="vi">')
+    for vi in analysis.volume_imbalances:
+        if vi.index < start:
+            continue
+        x = x_of(vi.index)
+        yt, yb = y_of(vi.high), y_of(vi.low)
+        col = C_BULL if vi.direction == "bull" else C_BEAR
+        parts.append(f'<rect x="{x-slot*0.45:.1f}" y="{yt:.1f}" '
+                     f'width="{slot*0.9:.1f}" height="{max(yb-yt,1):.1f}" '
+                     f'fill="{col}" fill-opacity="0.30">'
+                     f'<title>{vi.direction} volume imbalance '
+                     f'{_fmt_price(vi.low)}-{_fmt_price(vi.high)}</title></rect>')
+    parts.append('</g>')
+
     # ---- candles --------------------------------------------------------- #
     parts.append('<g data-layer="candles">')
     bw = slot * 0.62
@@ -287,6 +336,9 @@ def render_html(
         ("structure", "BOS / CHoCH / MSS", C_MSS),
         ("fvg", "Fair Value Gaps", C_BULL),
         ("ob", "Order Blocks", C_OB_BULL),
+        ("breakers", "Breakers", C_BULL),
+        ("rejection", "Rejection Blocks", C_BEAR),
+        ("vi", "Volume Imbalance", C_BULL),
         ("pools", "Liquidity Pools", C_BEAR),
         ("sweeps", "Sweeps", C_SWEEP),
         ("signals", "Signals", C_ENTRY),

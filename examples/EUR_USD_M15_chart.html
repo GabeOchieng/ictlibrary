@@ -51,7 +51,7 @@
   <div class="sub"><b>EUR_USD</b> · M15 · bias <b>bullish</b> · price <b>premium</b> · killzone <b>London Close</b> · 23 bars</div>
   <div class="stats">2 structure · 0/4 FVG open · 1/2 OB open · 2 sweeps · 1 signals</div>
 </header>
-<div class="legend"><label class="leg"><input type="checkbox" checked data-toggle="candles"><span class="dot" style="background:var(--fg)"></span>Candles</label><label class="leg"><input type="checkbox" checked data-toggle="pd"><span class="dot" style="background:#ffca28"></span>Premium / Discount</label><label class="leg"><input type="checkbox" checked data-toggle="swings"><span class="dot" style="background:#26a69a"></span>Swings</label><label class="leg"><input type="checkbox" checked data-toggle="structure"><span class="dot" style="background:#ffca28"></span>BOS / CHoCH / MSS</label><label class="leg"><input type="checkbox" checked data-toggle="fvg"><span class="dot" style="background:#26a69a"></span>Fair Value Gaps</label><label class="leg"><input type="checkbox" checked data-toggle="ob"><span class="dot" style="background:#2962ff"></span>Order Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="pools"><span class="dot" style="background:#ef5350"></span>Liquidity Pools</label><label class="leg"><input type="checkbox" checked data-toggle="sweeps"><span class="dot" style="background:#ab47bc"></span>Sweeps</label><label class="leg"><input type="checkbox" checked data-toggle="signals"><span class="dot" style="background:#ffca28"></span>Signals</label></div>
+<div class="legend"><label class="leg"><input type="checkbox" checked data-toggle="candles"><span class="dot" style="background:var(--fg)"></span>Candles</label><label class="leg"><input type="checkbox" checked data-toggle="pd"><span class="dot" style="background:#ffca28"></span>Premium / Discount</label><label class="leg"><input type="checkbox" checked data-toggle="swings"><span class="dot" style="background:#26a69a"></span>Swings</label><label class="leg"><input type="checkbox" checked data-toggle="structure"><span class="dot" style="background:#ffca28"></span>BOS / CHoCH / MSS</label><label class="leg"><input type="checkbox" checked data-toggle="fvg"><span class="dot" style="background:#26a69a"></span>Fair Value Gaps</label><label class="leg"><input type="checkbox" checked data-toggle="ob"><span class="dot" style="background:#2962ff"></span>Order Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="breakers"><span class="dot" style="background:#26a69a"></span>Breakers</label><label class="leg"><input type="checkbox" checked data-toggle="rejection"><span class="dot" style="background:#ef5350"></span>Rejection Blocks</label><label class="leg"><input type="checkbox" checked data-toggle="vi"><span class="dot" style="background:#26a69a"></span>Volume Imbalance</label><label class="leg"><input type="checkbox" checked data-toggle="pools"><span class="dot" style="background:#ef5350"></span>Liquidity Pools</label><label class="leg"><input type="checkbox" checked data-toggle="sweeps"><span class="dot" style="background:#ab47bc"></span>Sweeps</label><label class="leg"><input type="checkbox" checked data-toggle="signals"><span class="dot" style="background:#ffca28"></span>Signals</label></div>
 <div class="wrap"><svg viewBox="0 0 592 440" preserveAspectRatio="xMinYMid meet" class="chart" role="img" aria-label="ICT Concept Map — EUR_USD">
 <g class="grid">
 <line x1="8.0" y1="410.0" x2="514.0" y2="410.0" class="gridline"/>
@@ -108,6 +108,15 @@
 <g data-layer="ob">
 <rect class="ob" x="305.0" y="294.2" width="198.0" height="4.1" fill="#2962ff" fill-opacity="0.16" stroke="#2962ff" stroke-opacity="0.6"><title>bull OB 1.08260-1.08270 MT 1.08265</title></rect>
 <rect class="ob" x="393.0" y="109.2" width="88.0" height="98.7" fill="#2962ff" fill-opacity="0.08" stroke="#2962ff" stroke-opacity="0.6"><title>bull OB 1.08480-1.08720 MT 1.08600 (mitigated)</title></rect>
+</g>
+<g data-layer="breakers">
+</g>
+<g data-layer="rejection">
+<rect x="292.9" y="298.3" width="24.2" height="82.2" fill="#26a69a" fill-opacity="0.22" stroke="#26a69a" stroke-opacity="0.7" stroke-width="0.8"><title>bull rejection block (wick 83%)</title></rect>
+</g>
+<g data-layer="vi">
+<rect x="317.1" y="290.1" width="19.8" height="8.2" fill="#26a69a" fill-opacity="0.30"><title>bull volume imbalance 1.08260-1.08280</title></rect>
+<rect x="361.1" y="117.4" width="19.8" height="57.6" fill="#ef5350" fill-opacity="0.30"><title>bear volume imbalance 1.08560-1.08700</title></rect>
 </g>
 <g data-layer="candles">
 <line x1="19.0" y1="257.2" x2="19.0" y2="298.3" stroke="#26a69a" stroke-width="1"/>
@@ -181,7 +190,7 @@
 <line x1="349.0" y1="388.8" x2="514.0" y2="388.8" stroke="#ef5350" stroke-width="1.1" stroke-dasharray="5 3"/>
 <line x1="349.0" y1="257.2" x2="514.0" y2="257.2" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
 <line x1="349.0" y1="35.2" x2="514.0" y2="35.2" stroke="#26a69a" stroke-width="1.1" stroke-dasharray="5 3"/>
-<text x="352.0" y="291.2" class="sig" fill="#ffca28">▲ LONG score 5</text>
+<text x="352.0" y="291.2" class="sig" fill="#ffca28">▲ LONG score 6</text>
 </g>
 </svg></div>
 <footer>ICT primitives detected by <code>ictlib</code>. Hover any element for

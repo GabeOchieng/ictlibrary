@@ -210,6 +210,86 @@ class DealingRange:
 
 
 # --------------------------------------------------------------------------- #
+# Breaker / rejection blocks and volume imbalance (more PD arrays)
+# --------------------------------------------------------------------------- #
+@dataclass
+class Breaker:
+    """A failed order block that flipped polarity
+    (concepts/08-breaker-blocks/breaker-block).
+
+    ``direction`` is the NEW polarity: "bull" = the flipped zone is support,
+    "bear" = resistance. The zone is the original OB body.
+    """
+
+    index: int          # original OB candle
+    ts: datetime
+    direction: str      # new polarity: "bull" | "bear"
+    low: float          # OB body low
+    high: float         # OB body high
+    ob_index: int
+    break_index: int    # candle that closed through the OB body with displacement
+    retested: bool = False
+    retested_index: Optional[int] = None
+    pd_side: Optional[str] = None
+
+    @property
+    def mt(self) -> float:
+        return (self.low + self.high) / 2.0
+
+
+@dataclass
+class RejectionBlock:
+    """A long-wick rejection at a key level
+    (concepts/19-rejection-blocks/rejection-block).
+
+    The rejected WICK is the zone (not the body). ``direction`` "bull" = long
+    lower wick rejecting down (support), "bear" = long upper wick rejecting up.
+    """
+
+    index: int
+    ts: datetime
+    direction: str      # "bull" | "bear"
+    low: float          # zone low  (wick region)
+    high: float         # zone high (wick region)
+    wick_pct: float
+    mitigated: bool = False
+    mitigated_index: Optional[int] = None
+    pd_side: Optional[str] = None
+
+    @property
+    def tip(self) -> float:
+        """The rejected extreme (wick tip) — the SL anchor."""
+        return self.low if self.direction == "bull" else self.high
+
+
+@dataclass
+class VolumeImbalance:
+    """A body-vs-body gap (concepts/06-fair-value-gaps/volume-imbalance).
+
+    bullish VI: O_n > C_{n-1}  → zone [C_{n-1}, O_n]
+    bearish VI: O_n < C_{n-1}  → zone [O_n, C_{n-1}]
+    Wicks may overlap — this is what distinguishes a VI from a strict FVG.
+    """
+
+    index: int          # candle n (gapped from n-1)
+    ts: datetime
+    direction: str      # "bull" | "bear"
+    low: float
+    high: float
+    mitigated: bool = False
+    mitigated_index: Optional[int] = None
+    pd_side: Optional[str] = None
+
+    @property
+    def ce(self) -> float:
+        return (self.low + self.high) / 2.0
+
+    @property
+    def size(self) -> float:
+        return self.high - self.low
+
+
+# --------------------------------------------------------------------------- #
 # Liquidity
 # --------------------------------------------------------------------------- #
 @dataclass
