@@ -25,6 +25,7 @@ from .models import (
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, TFRead, MTFContext, Unicorn,
+    InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
     Signal, to_jsonable,
 )
 from .analysis import Analysis, analyze
@@ -42,7 +43,8 @@ __all__ = [
     "LiquidityPool", "Sweep", "DealingRange", "Breaker", "RejectionBlock",
     "VolumeImbalance", "SessionRange", "AsianRange", "IPDALevels",
     "TurtleSoup", "CRTSetup", "QuarterlyContext", "TFRead", "MTFContext",
-    "Unicorn", "Signal", "to_jsonable",
+    "Unicorn", "InversionFVG", "BalancedPriceRange", "LiquidityVoid",
+    "PropulsionBlock", "Signal", "to_jsonable",
     "Analysis", "analyze", "scan", "scan_candles", "concepts",
     "RiskParams", "position_size", "r_multiple", "size_signal",
     "backtest", "BacktestResult", "Trade",

@@ -93,6 +93,61 @@ def find_sweeps(
     return sweeps
 
 
+def find_liquidity_voids(
+    candles: List[Candle],
+    *,
+    span: int = 4,
+    directional_pct: float = 0.8,
+    max_pullback: float = 0.3,
+) -> List["LiquidityVoid"]:
+    """Wide one-sided expansion spans (concepts/02/liquidity-void): >=80% of
+    closes in one direction and pullbacks small relative to the move."""
+    from ..models import LiquidityVoid
+    out: List[LiquidityVoid] = []
+    i = 0
+    n = len(candles)
+    while i < n - span:
+        window = candles[i:i + span]
+        ups = sum(1 for c in window if c.is_bull)
+        downs = span - ups
+        hi = max(c.high for c in window)
+        lo = min(c.low for c in window)
+        size = hi - lo
+        if size <= 0:
+            i += 1
+            continue
+        if ups / span >= directional_pct:
+            direction = "bull"
+        elif downs / span >= directional_pct:
+            direction = "bear"
+        else:
+            i += 1
+            continue
+        # pullback = largest counter-move within the span
+        pull = _max_pullback(window, direction)
+        if pull <= max_pullback * size:
+            out.append(LiquidityVoid(i, i + span - 1, direction, lo, hi))
+            i += span
+        else:
+            i += 1
+    return out
+
+
+def _max_pullback(window, direction) -> float:
+    worst = 0.0
+    if direction == "bull":
+        peak = window[0].high
+        for c in window:
+            peak = max(peak, c.high)
+            worst = max(worst, peak - c.low)
+    else:
+        trough = window[0].low
+        for c in window:
+            trough = min(trough, c.low)
+            worst = max(worst, c.high - trough)
+    return worst
+
+
 def infer_pip_size(candles: List[Candle]) -> float:
     """Guess the pip size from price magnitude (JPY pairs ~0.01, others 0.0001)."""
     if not candles:

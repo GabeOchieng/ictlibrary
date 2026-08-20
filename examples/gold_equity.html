@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XAUUSD M15 2009 — Backtest (min score 3)</title>
+<title>XAUUSD M15 2009 — Backtest (SD targets + structural stop)</title>
 <style>
   :root { --bg:#f7f8fa; --panel:#fff; --fg:#1a2027; --muted:#5b6672;
     --line:#e3e7ec; --border:#d7dde3; }
@@ -29,157 +29,157 @@
   footer { color:var(--muted); font-size:11px; margin-top:14px; }
 </style></head><body>
 <div class="wrap">
-  <h1>XAUUSD M15 2009 — Backtest (min score 3)</h1>
-  <div class="stats"><div class="stat"><div class="v">134</div><div class="k">trades</div></div><div class="stat"><div class="v">60%</div><div class="k">win rate</div></div><div class="stat"><div class="v">-3.95R</div><div class="k">total</div></div><div class="stat"><div class="v">-0.03R</div><div class="k">expectancy</div></div><div class="stat"><div class="v">0.93</div><div class="k">profit factor</div></div><div class="stat"><div class="v">16.73R</div><div class="k">max DD</div></div></div>
-  <svg viewBox="0 0 900 380" class="chart" role="img" aria-label="XAUUSD M15 2009 — Backtest (min score 3) equity curve">
+  <h1>XAUUSD M15 2009 — Backtest (SD targets + structural stop)</h1>
+  <div class="stats"><div class="stat"><div class="v">134</div><div class="k">trades</div></div><div class="stat"><div class="v">28%</div><div class="k">win rate</div></div><div class="stat"><div class="v">-25.42R</div><div class="k">total</div></div><div class="stat"><div class="v">-0.19R</div><div class="k">expectancy</div></div><div class="stat"><div class="v">0.74</div><div class="k">profit factor</div></div><div class="stat"><div class="v">26.12R</div><div class="k">max DD</div></div></div>
+  <svg viewBox="0 0 900 380" class="chart" role="img" aria-label="XAUUSD M15 2009 — Backtest (SD targets + structural stop) equity curve">
 <line x1="54.0" y1="346.0" x2="880.0" y2="346.0" class="gridline"/>
-<text x="48.0" y="349.0" class="axis" text-anchor="end">-14.2R</text>
+<text x="48.0" y="349.0" class="axis" text-anchor="end">-26.1R</text>
 <line x1="54.0" y1="264.5" x2="880.0" y2="264.5" class="gridline"/>
-<text x="48.0" y="267.5" class="axis" text-anchor="end">-10.0R</text>
+<text x="48.0" y="267.5" class="axis" text-anchor="end">-19.6R</text>
 <line x1="54.0" y1="183.0" x2="880.0" y2="183.0" class="gridline"/>
-<text x="48.0" y="186.0" class="axis" text-anchor="end">-5.9R</text>
+<text x="48.0" y="186.0" class="axis" text-anchor="end">-13.1R</text>
 <line x1="54.0" y1="101.5" x2="880.0" y2="101.5" class="gridline"/>
-<text x="48.0" y="104.5" class="axis" text-anchor="end">-1.7R</text>
+<text x="48.0" y="104.5" class="axis" text-anchor="end">-6.5R</text>
 <line x1="54.0" y1="20.0" x2="880.0" y2="20.0" class="gridline"/>
-<text x="48.0" y="23.0" class="axis" text-anchor="end">2.5R</text>
-<line x1="54.0" y1="68.9" x2="880.0" y2="68.9" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"/>
-<polyline points="54.0,68.9 54.0,88.4 60.2,107.9 66.4,127.4 72.6,123.0 78.8,102.5 85.1,122.0 91.3,141.5 97.5,161.0 103.7,155.0 109.9,174.5 116.1,163.5 122.3,153.1 128.5,172.6 134.7,192.1 140.9,182.8 147.2,202.3 153.4,166.6 159.6,186.1 165.8,170.4 172.0,137.5 178.2,129.8 184.4,149.3 190.6,168.8 196.8,106.7 203.1,66.0 209.3,85.5 215.5,105.0 221.7,124.5 227.9,120.6 234.1,140.1 240.3,136.8 246.5,77.3 252.7,67.3 258.9,64.9 265.2,45.0 271.4,40.9 277.6,25.1 283.8,20.0 290.0,39.5 296.2,32.8 302.4,28.1 308.6,47.6 314.8,41.9 321.1,26.8 327.3,46.3 333.5,65.7 339.7,57.8 345.9,53.0 352.1,47.1 358.3,40.7 364.5,60.2 370.7,49.9 376.9,69.4 383.2,88.9 389.4,108.4 395.6,104.2 401.8,101.0 408.0,97.5 414.2,94.2 420.4,87.0 426.6,81.3 432.8,100.8 439.1,90.2 445.3,49.4 451.5,41.9 457.7,38.3 463.9,57.8 470.1,44.7 476.3,64.1 482.5,59.1 488.7,54.8 494.9,53.2 501.2,41.9 507.4,61.3 513.6,80.8 519.8,65.2 526.0,57.9 532.2,52.1 538.4,47.3 544.6,43.9 550.8,63.4 557.1,82.8 563.3,73.7 569.5,54.8 575.7,45.5 581.9,65.0 588.1,84.5 594.3,104.0 600.5,123.4 606.7,118.4 612.9,110.6 619.2,103.6 625.4,123.0 631.6,142.5 637.8,132.0 644.0,120.4 650.2,139.9 656.4,159.4 662.6,178.9 668.8,198.4 675.1,217.8 681.3,237.3 687.5,256.8 693.7,242.0 699.9,237.8 706.1,257.3 712.3,276.8 718.5,265.0 724.7,284.4 730.9,303.9 737.2,323.4 743.4,307.0 749.6,326.5 755.8,346.0 762.0,335.7 768.2,330.9 774.4,321.6 780.6,312.2 786.8,331.7 793.1,325.3 799.3,321.5 805.5,314.9 811.7,313.5 817.9,306.3 824.1,271.8 830.3,250.8 836.5,246.6 842.7,266.1 848.9,261.4 855.2,250.7 861.4,225.2 867.6,155.5 873.8,148.9 880.0,145.8 880.0,68.9" fill="#ef5350" fill-opacity="0.10" stroke="none"/>
-<polyline points="54.0,88.4 60.2,107.9 66.4,127.4 72.6,123.0 78.8,102.5 85.1,122.0 91.3,141.5 97.5,161.0 103.7,155.0 109.9,174.5 116.1,163.5 122.3,153.1 128.5,172.6 134.7,192.1 140.9,182.8 147.2,202.3 153.4,166.6 159.6,186.1 165.8,170.4 172.0,137.5 178.2,129.8 184.4,149.3 190.6,168.8 196.8,106.7 203.1,66.0 209.3,85.5 215.5,105.0 221.7,124.5 227.9,120.6 234.1,140.1 240.3,136.8 246.5,77.3 252.7,67.3 258.9,64.9 265.2,45.0 271.4,40.9 277.6,25.1 283.8,20.0 290.0,39.5 296.2,32.8 302.4,28.1 308.6,47.6 314.8,41.9 321.1,26.8 327.3,46.3 333.5,65.7 339.7,57.8 345.9,53.0 352.1,47.1 358.3,40.7 364.5,60.2 370.7,49.9 376.9,69.4 383.2,88.9 389.4,108.4 395.6,104.2 401.8,101.0 408.0,97.5 414.2,94.2 420.4,87.0 426.6,81.3 432.8,100.8 439.1,90.2 445.3,49.4 451.5,41.9 457.7,38.3 463.9,57.8 470.1,44.7 476.3,64.1 482.5,59.1 488.7,54.8 494.9,53.2 501.2,41.9 507.4,61.3 513.6,80.8 519.8,65.2 526.0,57.9 532.2,52.1 538.4,47.3 544.6,43.9 550.8,63.4 557.1,82.8 563.3,73.7 569.5,54.8 575.7,45.5 581.9,65.0 588.1,84.5 594.3,104.0 600.5,123.4 606.7,118.4 612.9,110.6 619.2,103.6 625.4,123.0 631.6,142.5 637.8,132.0 644.0,120.4 650.2,139.9 656.4,159.4 662.6,178.9 668.8,198.4 675.1,217.8 681.3,237.3 687.5,256.8 693.7,242.0 699.9,237.8 706.1,257.3 712.3,276.8 718.5,265.0 724.7,284.4 730.9,303.9 737.2,323.4 743.4,307.0 749.6,326.5 755.8,346.0 762.0,335.7 768.2,330.9 774.4,321.6 780.6,312.2 786.8,331.7 793.1,325.3 799.3,321.5 805.5,314.9 811.7,313.5 817.9,306.3 824.1,271.8 830.3,250.8 836.5,246.6 842.7,266.1 848.9,261.4 855.2,250.7 861.4,225.2 867.6,155.5 873.8,148.9 880.0,145.8" fill="none" stroke="#ef5350" stroke-width="2"/>
-<circle cx="54.0" cy="88.4" r="2.6" fill="#ef5350"><title>trade 1: -1.00R cumulative</title></circle>
-<circle cx="60.2" cy="107.9" r="2.6" fill="#ef5350"><title>trade 2: -2.00R cumulative</title></circle>
-<circle cx="66.4" cy="127.4" r="2.6" fill="#ef5350"><title>trade 3: -3.00R cumulative</title></circle>
-<circle cx="72.6" cy="123.0" r="2.6" fill="#ef5350"><title>trade 4: -2.77R cumulative</title></circle>
-<circle cx="78.8" cy="102.5" r="2.6" fill="#ef5350"><title>trade 5: -1.73R cumulative</title></circle>
-<circle cx="85.1" cy="122.0" r="2.6" fill="#ef5350"><title>trade 6: -2.73R cumulative</title></circle>
-<circle cx="91.3" cy="141.5" r="2.6" fill="#ef5350"><title>trade 7: -3.73R cumulative</title></circle>
-<circle cx="97.5" cy="161.0" r="2.6" fill="#ef5350"><title>trade 8: -4.73R cumulative</title></circle>
-<circle cx="103.7" cy="155.0" r="2.6" fill="#ef5350"><title>trade 9: -4.42R cumulative</title></circle>
-<circle cx="109.9" cy="174.5" r="2.6" fill="#ef5350"><title>trade 10: -5.42R cumulative</title></circle>
-<circle cx="116.1" cy="163.5" r="2.6" fill="#ef5350"><title>trade 11: -4.85R cumulative</title></circle>
-<circle cx="122.3" cy="153.1" r="2.6" fill="#ef5350"><title>trade 12: -4.32R cumulative</title></circle>
-<circle cx="128.5" cy="172.6" r="2.6" fill="#ef5350"><title>trade 13: -5.32R cumulative</title></circle>
-<circle cx="134.7" cy="192.1" r="2.6" fill="#ef5350"><title>trade 14: -6.32R cumulative</title></circle>
-<circle cx="140.9" cy="182.8" r="2.6" fill="#ef5350"><title>trade 15: -5.85R cumulative</title></circle>
-<circle cx="147.2" cy="202.3" r="2.6" fill="#ef5350"><title>trade 16: -6.85R cumulative</title></circle>
-<circle cx="153.4" cy="166.6" r="2.6" fill="#ef5350"><title>trade 17: -5.02R cumulative</title></circle>
-<circle cx="159.6" cy="186.1" r="2.6" fill="#ef5350"><title>trade 18: -6.02R cumulative</title></circle>
-<circle cx="165.8" cy="170.4" r="2.6" fill="#ef5350"><title>trade 19: -5.21R cumulative</title></circle>
-<circle cx="172.0" cy="137.5" r="2.6" fill="#ef5350"><title>trade 20: -3.52R cumulative</title></circle>
-<circle cx="178.2" cy="129.8" r="2.6" fill="#ef5350"><title>trade 21: -3.12R cumulative</title></circle>
-<circle cx="184.4" cy="149.3" r="2.6" fill="#ef5350"><title>trade 22: -4.12R cumulative</title></circle>
-<circle cx="190.6" cy="168.8" r="2.6" fill="#ef5350"><title>trade 23: -5.12R cumulative</title></circle>
-<circle cx="196.8" cy="106.7" r="2.6" fill="#ef5350"><title>trade 24: -1.94R cumulative</title></circle>
-<circle cx="203.1" cy="66.0" r="2.6" fill="#ef5350"><title>trade 25: 0.15R cumulative</title></circle>
-<circle cx="209.3" cy="85.5" r="2.6" fill="#ef5350"><title>trade 26: -0.85R cumulative</title></circle>
-<circle cx="215.5" cy="105.0" r="2.6" fill="#ef5350"><title>trade 27: -1.85R cumulative</title></circle>
-<circle cx="221.7" cy="124.5" r="2.6" fill="#ef5350"><title>trade 28: -2.85R cumulative</title></circle>
-<circle cx="227.9" cy="120.6" r="2.6" fill="#ef5350"><title>trade 29: -2.65R cumulative</title></circle>
-<circle cx="234.1" cy="140.1" r="2.6" fill="#ef5350"><title>trade 30: -3.65R cumulative</title></circle>
-<circle cx="240.3" cy="136.8" r="2.6" fill="#ef5350"><title>trade 31: -3.49R cumulative</title></circle>
-<circle cx="246.5" cy="77.3" r="2.6" fill="#ef5350"><title>trade 32: -0.43R cumulative</title></circle>
-<circle cx="252.7" cy="67.3" r="2.6" fill="#ef5350"><title>trade 33: 0.08R cumulative</title></circle>
-<circle cx="258.9" cy="64.9" r="2.6" fill="#ef5350"><title>trade 34: 0.21R cumulative</title></circle>
-<circle cx="265.2" cy="45.0" r="2.6" fill="#ef5350"><title>trade 35: 1.23R cumulative</title></circle>
-<circle cx="271.4" cy="40.9" r="2.6" fill="#ef5350"><title>trade 36: 1.44R cumulative</title></circle>
-<circle cx="277.6" cy="25.1" r="2.6" fill="#ef5350"><title>trade 37: 2.25R cumulative</title></circle>
-<circle cx="283.8" cy="20.0" r="2.6" fill="#ef5350"><title>trade 38: 2.51R cumulative</title></circle>
-<circle cx="290.0" cy="39.5" r="2.6" fill="#ef5350"><title>trade 39: 1.51R cumulative</title></circle>
-<circle cx="296.2" cy="32.8" r="2.6" fill="#ef5350"><title>trade 40: 1.85R cumulative</title></circle>
-<circle cx="302.4" cy="28.1" r="2.6" fill="#ef5350"><title>trade 41: 2.09R cumulative</title></circle>
-<circle cx="308.6" cy="47.6" r="2.6" fill="#ef5350"><title>trade 42: 1.09R cumulative</title></circle>
-<circle cx="314.8" cy="41.9" r="2.6" fill="#ef5350"><title>trade 43: 1.39R cumulative</title></circle>
-<circle cx="321.1" cy="26.8" r="2.6" fill="#ef5350"><title>trade 44: 2.16R cumulative</title></circle>
-<circle cx="327.3" cy="46.3" r="2.6" fill="#ef5350"><title>trade 45: 1.16R cumulative</title></circle>
-<circle cx="333.5" cy="65.7" r="2.6" fill="#ef5350"><title>trade 46: 0.16R cumulative</title></circle>
-<circle cx="339.7" cy="57.8" r="2.6" fill="#ef5350"><title>trade 47: 0.57R cumulative</title></circle>
-<circle cx="345.9" cy="53.0" r="2.6" fill="#ef5350"><title>trade 48: 0.81R cumulative</title></circle>
-<circle cx="352.1" cy="47.1" r="2.6" fill="#ef5350"><title>trade 49: 1.12R cumulative</title></circle>
-<circle cx="358.3" cy="40.7" r="2.6" fill="#ef5350"><title>trade 50: 1.45R cumulative</title></circle>
-<circle cx="364.5" cy="60.2" r="2.6" fill="#ef5350"><title>trade 51: 0.45R cumulative</title></circle>
-<circle cx="370.7" cy="49.9" r="2.6" fill="#ef5350"><title>trade 52: 0.98R cumulative</title></circle>
-<circle cx="376.9" cy="69.4" r="2.6" fill="#ef5350"><title>trade 53: -0.02R cumulative</title></circle>
-<circle cx="383.2" cy="88.9" r="2.6" fill="#ef5350"><title>trade 54: -1.02R cumulative</title></circle>
-<circle cx="389.4" cy="108.4" r="2.6" fill="#ef5350"><title>trade 55: -2.02R cumulative</title></circle>
-<circle cx="395.6" cy="104.2" r="2.6" fill="#ef5350"><title>trade 56: -1.81R cumulative</title></circle>
-<circle cx="401.8" cy="101.0" r="2.6" fill="#ef5350"><title>trade 57: -1.65R cumulative</title></circle>
-<circle cx="408.0" cy="97.5" r="2.6" fill="#ef5350"><title>trade 58: -1.47R cumulative</title></circle>
-<circle cx="414.2" cy="94.2" r="2.6" fill="#ef5350"><title>trade 59: -1.30R cumulative</title></circle>
-<circle cx="420.4" cy="87.0" r="2.6" fill="#ef5350"><title>trade 60: -0.93R cumulative</title></circle>
-<circle cx="426.6" cy="81.3" r="2.6" fill="#ef5350"><title>trade 61: -0.64R cumulative</title></circle>
-<circle cx="432.8" cy="100.8" r="2.6" fill="#ef5350"><title>trade 62: -1.64R cumulative</title></circle>
-<circle cx="439.1" cy="90.2" r="2.6" fill="#ef5350"><title>trade 63: -1.09R cumulative</title></circle>
-<circle cx="445.3" cy="49.4" r="2.6" fill="#ef5350"><title>trade 64: 1.00R cumulative</title></circle>
-<circle cx="451.5" cy="41.9" r="2.6" fill="#ef5350"><title>trade 65: 1.39R cumulative</title></circle>
-<circle cx="457.7" cy="38.3" r="2.6" fill="#ef5350"><title>trade 66: 1.57R cumulative</title></circle>
-<circle cx="463.9" cy="57.8" r="2.6" fill="#ef5350"><title>trade 67: 0.57R cumulative</title></circle>
-<circle cx="470.1" cy="44.7" r="2.6" fill="#ef5350"><title>trade 68: 1.24R cumulative</title></circle>
-<circle cx="476.3" cy="64.1" r="2.6" fill="#ef5350"><title>trade 69: 0.24R cumulative</title></circle>
-<circle cx="482.5" cy="59.1" r="2.6" fill="#ef5350"><title>trade 70: 0.50R cumulative</title></circle>
-<circle cx="488.7" cy="54.8" r="2.6" fill="#ef5350"><title>trade 71: 0.72R cumulative</title></circle>
-<circle cx="494.9" cy="53.2" r="2.6" fill="#ef5350"><title>trade 72: 0.80R cumulative</title></circle>
-<circle cx="501.2" cy="41.9" r="2.6" fill="#ef5350"><title>trade 73: 1.39R cumulative</title></circle>
-<circle cx="507.4" cy="61.3" r="2.6" fill="#ef5350"><title>trade 74: 0.39R cumulative</title></circle>
-<circle cx="513.6" cy="80.8" r="2.6" fill="#ef5350"><title>trade 75: -0.61R cumulative</title></circle>
-<circle cx="519.8" cy="65.2" r="2.6" fill="#ef5350"><title>trade 76: 0.19R cumulative</title></circle>
-<circle cx="526.0" cy="57.9" r="2.6" fill="#ef5350"><title>trade 77: 0.56R cumulative</title></circle>
-<circle cx="532.2" cy="52.1" r="2.6" fill="#ef5350"><title>trade 78: 0.86R cumulative</title></circle>
-<circle cx="538.4" cy="47.3" r="2.6" fill="#ef5350"><title>trade 79: 1.11R cumulative</title></circle>
-<circle cx="544.6" cy="43.9" r="2.6" fill="#ef5350"><title>trade 80: 1.29R cumulative</title></circle>
-<circle cx="550.8" cy="63.4" r="2.6" fill="#ef5350"><title>trade 81: 0.29R cumulative</title></circle>
-<circle cx="557.1" cy="82.8" r="2.6" fill="#ef5350"><title>trade 82: -0.71R cumulative</title></circle>
-<circle cx="563.3" cy="73.7" r="2.6" fill="#ef5350"><title>trade 83: -0.25R cumulative</title></circle>
-<circle cx="569.5" cy="54.8" r="2.6" fill="#ef5350"><title>trade 84: 0.72R cumulative</title></circle>
-<circle cx="575.7" cy="45.5" r="2.6" fill="#ef5350"><title>trade 85: 1.20R cumulative</title></circle>
-<circle cx="581.9" cy="65.0" r="2.6" fill="#ef5350"><title>trade 86: 0.20R cumulative</title></circle>
-<circle cx="588.1" cy="84.5" r="2.6" fill="#ef5350"><title>trade 87: -0.80R cumulative</title></circle>
-<circle cx="594.3" cy="104.0" r="2.6" fill="#ef5350"><title>trade 88: -1.80R cumulative</title></circle>
-<circle cx="600.5" cy="123.4" r="2.6" fill="#ef5350"><title>trade 89: -2.80R cumulative</title></circle>
-<circle cx="606.7" cy="118.4" r="2.6" fill="#ef5350"><title>trade 90: -2.54R cumulative</title></circle>
-<circle cx="612.9" cy="110.6" r="2.6" fill="#ef5350"><title>trade 91: -2.14R cumulative</title></circle>
-<circle cx="619.2" cy="103.6" r="2.6" fill="#ef5350"><title>trade 92: -1.78R cumulative</title></circle>
-<circle cx="625.4" cy="123.0" r="2.6" fill="#ef5350"><title>trade 93: -2.78R cumulative</title></circle>
-<circle cx="631.6" cy="142.5" r="2.6" fill="#ef5350"><title>trade 94: -3.78R cumulative</title></circle>
-<circle cx="637.8" cy="132.0" r="2.6" fill="#ef5350"><title>trade 95: -3.24R cumulative</title></circle>
-<circle cx="644.0" cy="120.4" r="2.6" fill="#ef5350"><title>trade 96: -2.64R cumulative</title></circle>
-<circle cx="650.2" cy="139.9" r="2.6" fill="#ef5350"><title>trade 97: -3.64R cumulative</title></circle>
-<circle cx="656.4" cy="159.4" r="2.6" fill="#ef5350"><title>trade 98: -4.64R cumulative</title></circle>
-<circle cx="662.6" cy="178.9" r="2.6" fill="#ef5350"><title>trade 99: -5.64R cumulative</title></circle>
-<circle cx="668.8" cy="198.4" r="2.6" fill="#ef5350"><title>trade 100: -6.64R cumulative</title></circle>
-<circle cx="675.1" cy="217.8" r="2.6" fill="#ef5350"><title>trade 101: -7.64R cumulative</title></circle>
-<circle cx="681.3" cy="237.3" r="2.6" fill="#ef5350"><title>trade 102: -8.64R cumulative</title></circle>
-<circle cx="687.5" cy="256.8" r="2.6" fill="#ef5350"><title>trade 103: -9.64R cumulative</title></circle>
-<circle cx="693.7" cy="242.0" r="2.6" fill="#ef5350"><title>trade 104: -8.88R cumulative</title></circle>
-<circle cx="699.9" cy="237.8" r="2.6" fill="#ef5350"><title>trade 105: -8.67R cumulative</title></circle>
-<circle cx="706.1" cy="257.3" r="2.6" fill="#ef5350"><title>trade 106: -9.67R cumulative</title></circle>
-<circle cx="712.3" cy="276.8" r="2.6" fill="#ef5350"><title>trade 107: -10.67R cumulative</title></circle>
-<circle cx="718.5" cy="265.0" r="2.6" fill="#ef5350"><title>trade 108: -10.06R cumulative</title></circle>
-<circle cx="724.7" cy="284.4" r="2.6" fill="#ef5350"><title>trade 109: -11.06R cumulative</title></circle>
-<circle cx="730.9" cy="303.9" r="2.6" fill="#ef5350"><title>trade 110: -12.06R cumulative</title></circle>
-<circle cx="737.2" cy="323.4" r="2.6" fill="#ef5350"><title>trade 111: -13.06R cumulative</title></circle>
-<circle cx="743.4" cy="307.0" r="2.6" fill="#ef5350"><title>trade 112: -12.22R cumulative</title></circle>
-<circle cx="749.6" cy="326.5" r="2.6" fill="#ef5350"><title>trade 113: -13.22R cumulative</title></circle>
-<circle cx="755.8" cy="346.0" r="2.6" fill="#ef5350"><title>trade 114: -14.22R cumulative</title></circle>
-<circle cx="762.0" cy="335.7" r="2.6" fill="#ef5350"><title>trade 115: -13.69R cumulative</title></circle>
-<circle cx="768.2" cy="330.9" r="2.6" fill="#ef5350"><title>trade 116: -13.45R cumulative</title></circle>
-<circle cx="774.4" cy="321.6" r="2.6" fill="#ef5350"><title>trade 117: -12.97R cumulative</title></circle>
-<circle cx="780.6" cy="312.2" r="2.6" fill="#ef5350"><title>trade 118: -12.49R cumulative</title></circle>
-<circle cx="786.8" cy="331.7" r="2.6" fill="#ef5350"><title>trade 119: -13.49R cumulative</title></circle>
-<circle cx="793.1" cy="325.3" r="2.6" fill="#ef5350"><title>trade 120: -13.16R cumulative</title></circle>
-<circle cx="799.3" cy="321.5" r="2.6" fill="#ef5350"><title>trade 121: -12.96R cumulative</title></circle>
-<circle cx="805.5" cy="314.9" r="2.6" fill="#ef5350"><title>trade 122: -12.63R cumulative</title></circle>
-<circle cx="811.7" cy="313.5" r="2.6" fill="#ef5350"><title>trade 123: -12.55R cumulative</title></circle>
-<circle cx="817.9" cy="306.3" r="2.6" fill="#ef5350"><title>trade 124: -12.18R cumulative</title></circle>
-<circle cx="824.1" cy="271.8" r="2.6" fill="#ef5350"><title>trade 125: -10.42R cumulative</title></circle>
-<circle cx="830.3" cy="250.8" r="2.6" fill="#ef5350"><title>trade 126: -9.34R cumulative</title></circle>
-<circle cx="836.5" cy="246.6" r="2.6" fill="#ef5350"><title>trade 127: -9.12R cumulative</title></circle>
-<circle cx="842.7" cy="266.1" r="2.6" fill="#ef5350"><title>trade 128: -10.12R cumulative</title></circle>
-<circle cx="848.9" cy="261.4" r="2.6" fill="#ef5350"><title>trade 129: -9.88R cumulative</title></circle>
-<circle cx="855.2" cy="250.7" r="2.6" fill="#ef5350"><title>trade 130: -9.33R cumulative</title></circle>
-<circle cx="861.4" cy="225.2" r="2.6" fill="#ef5350"><title>trade 131: -8.02R cumulative</title></circle>
-<circle cx="867.6" cy="155.5" r="2.6" fill="#ef5350"><title>trade 132: -4.44R cumulative</title></circle>
-<circle cx="873.8" cy="148.9" r="2.6" fill="#ef5350"><title>trade 133: -4.11R cumulative</title></circle>
-<circle cx="880.0" cy="145.8" r="2.6" fill="#ef5350"><title>trade 134: -3.95R cumulative</title></circle>
-<text x="880.0" y="137.8" class="sig" fill="#ef5350" text-anchor="end">-3.95R</text>
+<text x="48.0" y="23.0" class="axis" text-anchor="end">0.0R</text>
+<line x1="54.0" y1="20.0" x2="880.0" y2="20.0" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"/>
+<polyline points="54.0,20.0 54.0,32.5 60.2,45.0 66.4,57.4 72.6,69.9 78.8,82.4 85.1,94.9 91.3,107.4 97.5,119.8 103.7,132.3 109.9,107.5 116.1,120.0 122.3,132.5 128.5,144.9 134.7,157.4 140.9,140.1 147.2,152.5 153.4,84.9 159.6,97.4 165.8,109.8 172.0,122.3 178.2,98.8 184.4,111.3 190.6,123.7 196.8,105.7 203.1,118.2 209.3,130.6 215.5,143.1 221.7,155.6 227.9,145.3 234.1,157.8 240.3,170.3 246.5,95.3 252.7,107.8 258.9,99.2 265.2,111.7 271.4,124.2 277.6,112.2 283.8,99.4 290.0,111.9 296.2,89.8 302.4,102.3 308.6,114.8 314.8,127.3 321.1,111.2 327.3,123.7 333.5,136.2 339.7,148.6 345.9,161.1 352.1,153.6 358.3,128.9 364.5,141.4 370.7,105.7 376.9,118.2 383.2,130.7 389.4,143.1 395.6,130.0 401.8,142.5 408.0,155.0 414.2,167.4 420.4,143.5 426.6,156.0 432.8,168.5 439.1,136.5 445.3,75.5 451.5,87.9 457.7,100.4 463.9,112.9 470.1,125.4 476.3,137.9 482.5,120.7 488.7,114.8 494.9,127.3 501.2,139.8 507.4,152.3 513.6,125.6 519.8,102.0 526.0,114.5 532.2,127.0 538.4,87.5 544.6,75.0 550.8,87.5 557.1,100.0 563.3,112.4 569.5,80.7 575.7,54.9 581.9,67.4 588.1,79.8 594.3,92.3 600.5,104.8 606.7,117.3 612.9,129.8 619.2,142.2 625.4,154.7 631.6,167.2 637.8,179.7 644.0,192.2 650.2,204.6 656.4,217.1 662.6,229.6 668.8,242.1 675.1,254.6 681.3,267.0 687.5,279.5 693.7,292.0 699.9,304.5 706.1,317.0 712.3,329.4 718.5,295.9 724.7,308.4 730.9,320.8 737.2,333.3 743.4,308.6 749.6,321.0 755.8,333.5 762.0,346.0 768.2,319.8 774.4,310.0 780.6,297.7 786.8,310.2 793.1,322.7 799.3,312.1 805.5,324.5 811.7,318.6 817.9,297.1 824.1,309.6 830.3,283.6 836.5,296.1 842.7,308.6 848.9,321.1 855.2,333.6 861.4,315.4 867.6,327.9 873.8,340.4 880.0,337.3 880.0,20.0" fill="#ef5350" fill-opacity="0.10" stroke="none"/>
+<polyline points="54.0,32.5 60.2,45.0 66.4,57.4 72.6,69.9 78.8,82.4 85.1,94.9 91.3,107.4 97.5,119.8 103.7,132.3 109.9,107.5 116.1,120.0 122.3,132.5 128.5,144.9 134.7,157.4 140.9,140.1 147.2,152.5 153.4,84.9 159.6,97.4 165.8,109.8 172.0,122.3 178.2,98.8 184.4,111.3 190.6,123.7 196.8,105.7 203.1,118.2 209.3,130.6 215.5,143.1 221.7,155.6 227.9,145.3 234.1,157.8 240.3,170.3 246.5,95.3 252.7,107.8 258.9,99.2 265.2,111.7 271.4,124.2 277.6,112.2 283.8,99.4 290.0,111.9 296.2,89.8 302.4,102.3 308.6,114.8 314.8,127.3 321.1,111.2 327.3,123.7 333.5,136.2 339.7,148.6 345.9,161.1 352.1,153.6 358.3,128.9 364.5,141.4 370.7,105.7 376.9,118.2 383.2,130.7 389.4,143.1 395.6,130.0 401.8,142.5 408.0,155.0 414.2,167.4 420.4,143.5 426.6,156.0 432.8,168.5 439.1,136.5 445.3,75.5 451.5,87.9 457.7,100.4 463.9,112.9 470.1,125.4 476.3,137.9 482.5,120.7 488.7,114.8 494.9,127.3 501.2,139.8 507.4,152.3 513.6,125.6 519.8,102.0 526.0,114.5 532.2,127.0 538.4,87.5 544.6,75.0 550.8,87.5 557.1,100.0 563.3,112.4 569.5,80.7 575.7,54.9 581.9,67.4 588.1,79.8 594.3,92.3 600.5,104.8 606.7,117.3 612.9,129.8 619.2,142.2 625.4,154.7 631.6,167.2 637.8,179.7 644.0,192.2 650.2,204.6 656.4,217.1 662.6,229.6 668.8,242.1 675.1,254.6 681.3,267.0 687.5,279.5 693.7,292.0 699.9,304.5 706.1,317.0 712.3,329.4 718.5,295.9 724.7,308.4 730.9,320.8 737.2,333.3 743.4,308.6 749.6,321.0 755.8,333.5 762.0,346.0 768.2,319.8 774.4,310.0 780.6,297.7 786.8,310.2 793.1,322.7 799.3,312.1 805.5,324.5 811.7,318.6 817.9,297.1 824.1,309.6 830.3,283.6 836.5,296.1 842.7,308.6 848.9,321.1 855.2,333.6 861.4,315.4 867.6,327.9 873.8,340.4 880.0,337.3" fill="none" stroke="#ef5350" stroke-width="2"/>
+<circle cx="54.0" cy="32.5" r="2.6" fill="#ef5350"><title>trade 1: -1.00R cumulative</title></circle>
+<circle cx="60.2" cy="45.0" r="2.6" fill="#ef5350"><title>trade 2: -2.00R cumulative</title></circle>
+<circle cx="66.4" cy="57.4" r="2.6" fill="#ef5350"><title>trade 3: -3.00R cumulative</title></circle>
+<circle cx="72.6" cy="69.9" r="2.6" fill="#ef5350"><title>trade 4: -4.00R cumulative</title></circle>
+<circle cx="78.8" cy="82.4" r="2.6" fill="#ef5350"><title>trade 5: -5.00R cumulative</title></circle>
+<circle cx="85.1" cy="94.9" r="2.6" fill="#ef5350"><title>trade 6: -6.00R cumulative</title></circle>
+<circle cx="91.3" cy="107.4" r="2.6" fill="#ef5350"><title>trade 7: -7.00R cumulative</title></circle>
+<circle cx="97.5" cy="119.8" r="2.6" fill="#ef5350"><title>trade 8: -8.00R cumulative</title></circle>
+<circle cx="103.7" cy="132.3" r="2.6" fill="#ef5350"><title>trade 9: -9.00R cumulative</title></circle>
+<circle cx="109.9" cy="107.5" r="2.6" fill="#ef5350"><title>trade 10: -7.01R cumulative</title></circle>
+<circle cx="116.1" cy="120.0" r="2.6" fill="#ef5350"><title>trade 11: -8.01R cumulative</title></circle>
+<circle cx="122.3" cy="132.5" r="2.6" fill="#ef5350"><title>trade 12: -9.01R cumulative</title></circle>
+<circle cx="128.5" cy="144.9" r="2.6" fill="#ef5350"><title>trade 13: -10.01R cumulative</title></circle>
+<circle cx="134.7" cy="157.4" r="2.6" fill="#ef5350"><title>trade 14: -11.01R cumulative</title></circle>
+<circle cx="140.9" cy="140.1" r="2.6" fill="#ef5350"><title>trade 15: -9.62R cumulative</title></circle>
+<circle cx="147.2" cy="152.5" r="2.6" fill="#ef5350"><title>trade 16: -10.62R cumulative</title></circle>
+<circle cx="153.4" cy="84.9" r="2.6" fill="#ef5350"><title>trade 17: -5.20R cumulative</title></circle>
+<circle cx="159.6" cy="97.4" r="2.6" fill="#ef5350"><title>trade 18: -6.20R cumulative</title></circle>
+<circle cx="165.8" cy="109.8" r="2.6" fill="#ef5350"><title>trade 19: -7.20R cumulative</title></circle>
+<circle cx="172.0" cy="122.3" r="2.6" fill="#ef5350"><title>trade 20: -8.20R cumulative</title></circle>
+<circle cx="178.2" cy="98.8" r="2.6" fill="#ef5350"><title>trade 21: -6.31R cumulative</title></circle>
+<circle cx="184.4" cy="111.3" r="2.6" fill="#ef5350"><title>trade 22: -7.31R cumulative</title></circle>
+<circle cx="190.6" cy="123.7" r="2.6" fill="#ef5350"><title>trade 23: -8.31R cumulative</title></circle>
+<circle cx="196.8" cy="105.7" r="2.6" fill="#ef5350"><title>trade 24: -6.87R cumulative</title></circle>
+<circle cx="203.1" cy="118.2" r="2.6" fill="#ef5350"><title>trade 25: -7.87R cumulative</title></circle>
+<circle cx="209.3" cy="130.6" r="2.6" fill="#ef5350"><title>trade 26: -8.87R cumulative</title></circle>
+<circle cx="215.5" cy="143.1" r="2.6" fill="#ef5350"><title>trade 27: -9.87R cumulative</title></circle>
+<circle cx="221.7" cy="155.6" r="2.6" fill="#ef5350"><title>trade 28: -10.87R cumulative</title></circle>
+<circle cx="227.9" cy="145.3" r="2.6" fill="#ef5350"><title>trade 29: -10.04R cumulative</title></circle>
+<circle cx="234.1" cy="157.8" r="2.6" fill="#ef5350"><title>trade 30: -11.04R cumulative</title></circle>
+<circle cx="240.3" cy="170.3" r="2.6" fill="#ef5350"><title>trade 31: -12.04R cumulative</title></circle>
+<circle cx="246.5" cy="95.3" r="2.6" fill="#ef5350"><title>trade 32: -6.03R cumulative</title></circle>
+<circle cx="252.7" cy="107.8" r="2.6" fill="#ef5350"><title>trade 33: -7.03R cumulative</title></circle>
+<circle cx="258.9" cy="99.2" r="2.6" fill="#ef5350"><title>trade 34: -6.35R cumulative</title></circle>
+<circle cx="265.2" cy="111.7" r="2.6" fill="#ef5350"><title>trade 35: -7.35R cumulative</title></circle>
+<circle cx="271.4" cy="124.2" r="2.6" fill="#ef5350"><title>trade 36: -8.35R cumulative</title></circle>
+<circle cx="277.6" cy="112.2" r="2.6" fill="#ef5350"><title>trade 37: -7.39R cumulative</title></circle>
+<circle cx="283.8" cy="99.4" r="2.6" fill="#ef5350"><title>trade 38: -6.36R cumulative</title></circle>
+<circle cx="290.0" cy="111.9" r="2.6" fill="#ef5350"><title>trade 39: -7.36R cumulative</title></circle>
+<circle cx="296.2" cy="89.8" r="2.6" fill="#ef5350"><title>trade 40: -5.59R cumulative</title></circle>
+<circle cx="302.4" cy="102.3" r="2.6" fill="#ef5350"><title>trade 41: -6.59R cumulative</title></circle>
+<circle cx="308.6" cy="114.8" r="2.6" fill="#ef5350"><title>trade 42: -7.59R cumulative</title></circle>
+<circle cx="314.8" cy="127.3" r="2.6" fill="#ef5350"><title>trade 43: -8.59R cumulative</title></circle>
+<circle cx="321.1" cy="111.2" r="2.6" fill="#ef5350"><title>trade 44: -7.31R cumulative</title></circle>
+<circle cx="327.3" cy="123.7" r="2.6" fill="#ef5350"><title>trade 45: -8.31R cumulative</title></circle>
+<circle cx="333.5" cy="136.2" r="2.6" fill="#ef5350"><title>trade 46: -9.31R cumulative</title></circle>
+<circle cx="339.7" cy="148.6" r="2.6" fill="#ef5350"><title>trade 47: -10.31R cumulative</title></circle>
+<circle cx="345.9" cy="161.1" r="2.6" fill="#ef5350"><title>trade 48: -11.31R cumulative</title></circle>
+<circle cx="352.1" cy="153.6" r="2.6" fill="#ef5350"><title>trade 49: -10.70R cumulative</title></circle>
+<circle cx="358.3" cy="128.9" r="2.6" fill="#ef5350"><title>trade 50: -8.73R cumulative</title></circle>
+<circle cx="364.5" cy="141.4" r="2.6" fill="#ef5350"><title>trade 51: -9.73R cumulative</title></circle>
+<circle cx="370.7" cy="105.7" r="2.6" fill="#ef5350"><title>trade 52: -6.87R cumulative</title></circle>
+<circle cx="376.9" cy="118.2" r="2.6" fill="#ef5350"><title>trade 53: -7.87R cumulative</title></circle>
+<circle cx="383.2" cy="130.7" r="2.6" fill="#ef5350"><title>trade 54: -8.87R cumulative</title></circle>
+<circle cx="389.4" cy="143.1" r="2.6" fill="#ef5350"><title>trade 55: -9.87R cumulative</title></circle>
+<circle cx="395.6" cy="130.0" r="2.6" fill="#ef5350"><title>trade 56: -8.81R cumulative</title></circle>
+<circle cx="401.8" cy="142.5" r="2.6" fill="#ef5350"><title>trade 57: -9.81R cumulative</title></circle>
+<circle cx="408.0" cy="155.0" r="2.6" fill="#ef5350"><title>trade 58: -10.81R cumulative</title></circle>
+<circle cx="414.2" cy="167.4" r="2.6" fill="#ef5350"><title>trade 59: -11.81R cumulative</title></circle>
+<circle cx="420.4" cy="143.5" r="2.6" fill="#ef5350"><title>trade 60: -9.90R cumulative</title></circle>
+<circle cx="426.6" cy="156.0" r="2.6" fill="#ef5350"><title>trade 61: -10.90R cumulative</title></circle>
+<circle cx="432.8" cy="168.5" r="2.6" fill="#ef5350"><title>trade 62: -11.90R cumulative</title></circle>
+<circle cx="439.1" cy="136.5" r="2.6" fill="#ef5350"><title>trade 63: -9.33R cumulative</title></circle>
+<circle cx="445.3" cy="75.5" r="2.6" fill="#ef5350"><title>trade 64: -4.44R cumulative</title></circle>
+<circle cx="451.5" cy="87.9" r="2.6" fill="#ef5350"><title>trade 65: -5.44R cumulative</title></circle>
+<circle cx="457.7" cy="100.4" r="2.6" fill="#ef5350"><title>trade 66: -6.44R cumulative</title></circle>
+<circle cx="463.9" cy="112.9" r="2.6" fill="#ef5350"><title>trade 67: -7.44R cumulative</title></circle>
+<circle cx="470.1" cy="125.4" r="2.6" fill="#ef5350"><title>trade 68: -8.44R cumulative</title></circle>
+<circle cx="476.3" cy="137.9" r="2.6" fill="#ef5350"><title>trade 69: -9.44R cumulative</title></circle>
+<circle cx="482.5" cy="120.7" r="2.6" fill="#ef5350"><title>trade 70: -8.07R cumulative</title></circle>
+<circle cx="488.7" cy="114.8" r="2.6" fill="#ef5350"><title>trade 71: -7.60R cumulative</title></circle>
+<circle cx="494.9" cy="127.3" r="2.6" fill="#ef5350"><title>trade 72: -8.60R cumulative</title></circle>
+<circle cx="501.2" cy="139.8" r="2.6" fill="#ef5350"><title>trade 73: -9.60R cumulative</title></circle>
+<circle cx="507.4" cy="152.3" r="2.6" fill="#ef5350"><title>trade 74: -10.60R cumulative</title></circle>
+<circle cx="513.6" cy="125.6" r="2.6" fill="#ef5350"><title>trade 75: -8.46R cumulative</title></circle>
+<circle cx="519.8" cy="102.0" r="2.6" fill="#ef5350"><title>trade 76: -6.57R cumulative</title></circle>
+<circle cx="526.0" cy="114.5" r="2.6" fill="#ef5350"><title>trade 77: -7.57R cumulative</title></circle>
+<circle cx="532.2" cy="127.0" r="2.6" fill="#ef5350"><title>trade 78: -8.57R cumulative</title></circle>
+<circle cx="538.4" cy="87.5" r="2.6" fill="#ef5350"><title>trade 79: -5.41R cumulative</title></circle>
+<circle cx="544.6" cy="75.0" r="2.6" fill="#ef5350"><title>trade 80: -4.41R cumulative</title></circle>
+<circle cx="550.8" cy="87.5" r="2.6" fill="#ef5350"><title>trade 81: -5.41R cumulative</title></circle>
+<circle cx="557.1" cy="100.0" r="2.6" fill="#ef5350"><title>trade 82: -6.41R cumulative</title></circle>
+<circle cx="563.3" cy="112.4" r="2.6" fill="#ef5350"><title>trade 83: -7.41R cumulative</title></circle>
+<circle cx="569.5" cy="80.7" r="2.6" fill="#ef5350"><title>trade 84: -4.87R cumulative</title></circle>
+<circle cx="575.7" cy="54.9" r="2.6" fill="#ef5350"><title>trade 85: -2.79R cumulative</title></circle>
+<circle cx="581.9" cy="67.4" r="2.6" fill="#ef5350"><title>trade 86: -3.79R cumulative</title></circle>
+<circle cx="588.1" cy="79.8" r="2.6" fill="#ef5350"><title>trade 87: -4.79R cumulative</title></circle>
+<circle cx="594.3" cy="92.3" r="2.6" fill="#ef5350"><title>trade 88: -5.79R cumulative</title></circle>
+<circle cx="600.5" cy="104.8" r="2.6" fill="#ef5350"><title>trade 89: -6.79R cumulative</title></circle>
+<circle cx="606.7" cy="117.3" r="2.6" fill="#ef5350"><title>trade 90: -7.79R cumulative</title></circle>
+<circle cx="612.9" cy="129.8" r="2.6" fill="#ef5350"><title>trade 91: -8.79R cumulative</title></circle>
+<circle cx="619.2" cy="142.2" r="2.6" fill="#ef5350"><title>trade 92: -9.79R cumulative</title></circle>
+<circle cx="625.4" cy="154.7" r="2.6" fill="#ef5350"><title>trade 93: -10.79R cumulative</title></circle>
+<circle cx="631.6" cy="167.2" r="2.6" fill="#ef5350"><title>trade 94: -11.79R cumulative</title></circle>
+<circle cx="637.8" cy="179.7" r="2.6" fill="#ef5350"><title>trade 95: -12.79R cumulative</title></circle>
+<circle cx="644.0" cy="192.2" r="2.6" fill="#ef5350"><title>trade 96: -13.79R cumulative</title></circle>
+<circle cx="650.2" cy="204.6" r="2.6" fill="#ef5350"><title>trade 97: -14.79R cumulative</title></circle>
+<circle cx="656.4" cy="217.1" r="2.6" fill="#ef5350"><title>trade 98: -15.79R cumulative</title></circle>
+<circle cx="662.6" cy="229.6" r="2.6" fill="#ef5350"><title>trade 99: -16.79R cumulative</title></circle>
+<circle cx="668.8" cy="242.1" r="2.6" fill="#ef5350"><title>trade 100: -17.79R cumulative</title></circle>
+<circle cx="675.1" cy="254.6" r="2.6" fill="#ef5350"><title>trade 101: -18.79R cumulative</title></circle>
+<circle cx="681.3" cy="267.0" r="2.6" fill="#ef5350"><title>trade 102: -19.79R cumulative</title></circle>
+<circle cx="687.5" cy="279.5" r="2.6" fill="#ef5350"><title>trade 103: -20.79R cumulative</title></circle>
+<circle cx="693.7" cy="292.0" r="2.6" fill="#ef5350"><title>trade 104: -21.79R cumulative</title></circle>
+<circle cx="699.9" cy="304.5" r="2.6" fill="#ef5350"><title>trade 105: -22.79R cumulative</title></circle>
+<circle cx="706.1" cy="317.0" r="2.6" fill="#ef5350"><title>trade 106: -23.79R cumulative</title></circle>
+<circle cx="712.3" cy="329.4" r="2.6" fill="#ef5350"><title>trade 107: -24.79R cumulative</title></circle>
+<circle cx="718.5" cy="295.9" r="2.6" fill="#ef5350"><title>trade 108: -22.11R cumulative</title></circle>
+<circle cx="724.7" cy="308.4" r="2.6" fill="#ef5350"><title>trade 109: -23.11R cumulative</title></circle>
+<circle cx="730.9" cy="320.8" r="2.6" fill="#ef5350"><title>trade 110: -24.11R cumulative</title></circle>
+<circle cx="737.2" cy="333.3" r="2.6" fill="#ef5350"><title>trade 111: -25.11R cumulative</title></circle>
+<circle cx="743.4" cy="308.6" r="2.6" fill="#ef5350"><title>trade 112: -23.12R cumulative</title></circle>
+<circle cx="749.6" cy="321.0" r="2.6" fill="#ef5350"><title>trade 113: -24.12R cumulative</title></circle>
+<circle cx="755.8" cy="333.5" r="2.6" fill="#ef5350"><title>trade 114: -25.12R cumulative</title></circle>
+<circle cx="762.0" cy="346.0" r="2.6" fill="#ef5350"><title>trade 115: -26.12R cumulative</title></circle>
+<circle cx="768.2" cy="319.8" r="2.6" fill="#ef5350"><title>trade 116: -24.02R cumulative</title></circle>
+<circle cx="774.4" cy="310.0" r="2.6" fill="#ef5350"><title>trade 117: -23.23R cumulative</title></circle>
+<circle cx="780.6" cy="297.7" r="2.6" fill="#ef5350"><title>trade 118: -22.25R cumulative</title></circle>
+<circle cx="786.8" cy="310.2" r="2.6" fill="#ef5350"><title>trade 119: -23.25R cumulative</title></circle>
+<circle cx="793.1" cy="322.7" r="2.6" fill="#ef5350"><title>trade 120: -24.25R cumulative</title></circle>
+<circle cx="799.3" cy="312.1" r="2.6" fill="#ef5350"><title>trade 121: -23.40R cumulative</title></circle>
+<circle cx="805.5" cy="324.5" r="2.6" fill="#ef5350"><title>trade 122: -24.40R cumulative</title></circle>
+<circle cx="811.7" cy="318.6" r="2.6" fill="#ef5350"><title>trade 123: -23.93R cumulative</title></circle>
+<circle cx="817.9" cy="297.1" r="2.6" fill="#ef5350"><title>trade 124: -22.20R cumulative</title></circle>
+<circle cx="824.1" cy="309.6" r="2.6" fill="#ef5350"><title>trade 125: -23.20R cumulative</title></circle>
+<circle cx="830.3" cy="283.6" r="2.6" fill="#ef5350"><title>trade 126: -21.12R cumulative</title></circle>
+<circle cx="836.5" cy="296.1" r="2.6" fill="#ef5350"><title>trade 127: -22.12R cumulative</title></circle>
+<circle cx="842.7" cy="308.6" r="2.6" fill="#ef5350"><title>trade 128: -23.12R cumulative</title></circle>
+<circle cx="848.9" cy="321.1" r="2.6" fill="#ef5350"><title>trade 129: -24.12R cumulative</title></circle>
+<circle cx="855.2" cy="333.6" r="2.6" fill="#ef5350"><title>trade 130: -25.12R cumulative</title></circle>
+<circle cx="861.4" cy="315.4" r="2.6" fill="#ef5350"><title>trade 131: -23.67R cumulative</title></circle>
+<circle cx="867.6" cy="327.9" r="2.6" fill="#ef5350"><title>trade 132: -24.67R cumulative</title></circle>
+<circle cx="873.8" cy="340.4" r="2.6" fill="#ef5350"><title>trade 133: -25.67R cumulative</title></circle>
+<circle cx="880.0" cy="337.3" r="2.6" fill="#ef5350"><title>trade 134: -25.42R cumulative</title></circle>
+<text x="880.0" y="329.3" class="sig" fill="#ef5350" text-anchor="end">-25.42R</text>
 </svg>
   <footer>Cumulative R across closed trades. Walk-forward, no lookahead.
   Educational — not financial advice.</footer>

@@ -16,6 +16,7 @@ from .models import (
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
     TurtleSoup, CRTSetup, QuarterlyContext, MTFContext, Unicorn,
+    InversionFVG, BalancedPriceRange, LiquidityVoid, PropulsionBlock,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -24,6 +25,9 @@ from .concepts import (
     find_breakers, find_rejection_blocks, find_volume_imbalances,
     all_session_ranges, asian_range, ipda_levels,
     find_turtle_soups, quarterly_context, find_crt_setups,
+    find_inversion_fvgs, find_bpr, find_nested_fvgs,
+    find_propulsion_blocks, find_liquidity_voids,
+    classify_internal_external, range_state,
 )
 
 
@@ -48,6 +52,12 @@ class Analysis:
     quarterly: Optional[QuarterlyContext] = None
     mtf: Optional[MTFContext] = None
     unicorns: List[Unicorn] = field(default_factory=list)
+    inversion_fvgs: List[InversionFVG] = field(default_factory=list)
+    bpr: List[BalancedPriceRange] = field(default_factory=list)
+    nested_fvgs: list = field(default_factory=list)
+    liquidity_voids: List[LiquidityVoid] = field(default_factory=list)
+    propulsion_blocks: List[PropulsionBlock] = field(default_factory=list)
+    range_state: str = "unknown"
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -121,6 +131,12 @@ class Analysis:
             "htf_bias": self.mtf.bias if self.mtf else None,
             "htf_reads": [(r.label, r.bias) for r in self.mtf.reads] if self.mtf else [],
             "unicorns": len(self.unicorns),
+            "inversion_fvgs": len(self.inversion_fvgs),
+            "bpr": len(self.bpr),
+            "nested_fvgs": len(self.nested_fvgs),
+            "liquidity_voids": len(self.liquidity_voids),
+            "propulsion_blocks": len(self.propulsion_blocks),
+            "range_state": self.range_state,
         }
 
 
@@ -164,6 +180,13 @@ def analyze(
         from .mtf import multi_timeframe_bias
         mtf = multi_timeframe_bias(candles, htf_timeframes)
 
+    inv_fvgs = find_inversion_fvgs(candles, fvgs)
+    bpr = find_bpr(fvgs)
+    nested = find_nested_fvgs(fvgs)
+    voids = find_liquidity_voids(candles)
+    propulsion = find_propulsion_blocks(candles, obs)
+    rstate = range_state(candles)
+
     # tag every PD array with the side of equilibrium it sits on
     if drange is not None:
         for f in fvgs:
@@ -196,6 +219,12 @@ def analyze(
         crt_setups=crt,
         quarterly=quarterly,
         mtf=mtf,
+        inversion_fvgs=inv_fvgs,
+        bpr=bpr,
+        nested_fvgs=nested,
+        liquidity_voids=voids,
+        propulsion_blocks=propulsion,
+        range_state=rstate,
         dealing_range=drange,
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,

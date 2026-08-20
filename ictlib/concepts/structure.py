@@ -131,3 +131,36 @@ def current_bias(events: List[StructureEvent]) -> str:
     if not events:
         return "neutral"
     return "bullish" if events[-1].direction == "bull" else "bearish"
+
+
+def classify_internal_external(swings: List[Swing], dealing_range) -> dict:
+    """Label each swing internal (inside the dealing range) or external (a bound)
+    (concepts/01-market-structure/internal-structure, external-structure).
+    Returns {swing_index: "internal" | "external"}."""
+    out: dict = {}
+    if dealing_range is None:
+        return out
+    lo, hi = dealing_range.bottom, dealing_range.top
+    for s in swings:
+        out[s.index] = "external" if (s.price >= hi or s.price <= lo) else "internal"
+    return out
+
+
+def range_state(candles: List[Candle], lookback: int = 20, expansion_mult: float = 1.3) -> str:
+    """Expansion vs contraction (concepts/01-market-structure/range-*): compares
+    recent bar ranges to the prior baseline."""
+    n = len(candles)
+    if n < lookback * 2:
+        return "unknown"
+    recent = candles[n - lookback:]
+    prior = candles[n - 2 * lookback:n - lookback]
+    r_recent = sum(c.range for c in recent) / lookback
+    r_prior = sum(c.range for c in prior) / lookback
+    if r_prior <= 0:
+        return "unknown"
+    ratio = r_recent / r_prior
+    if ratio >= expansion_mult:
+        return "expansion"
+    if ratio <= 1 / expansion_mult:
+        return "contraction"
+    return "balanced"

@@ -213,6 +213,61 @@ class DealingRange:
 # Breaker / rejection blocks and volume imbalance (more PD arrays)
 # --------------------------------------------------------------------------- #
 @dataclass
+class InversionFVG:
+    """An FVG traded through that flipped polarity (concepts/06/inversion-fvg)."""
+
+    index: int          # original FVG middle candle
+    ts: datetime
+    direction: str      # NEW polarity after inversion
+    low: float
+    high: float
+    break_index: int    # candle that closed beyond the far edge
+
+    @property
+    def ce(self) -> float:
+        return (self.low + self.high) / 2.0
+
+
+@dataclass
+class BalancedPriceRange:
+    """Overlapping bullish + bearish FVG — a two-sided decision zone
+    (concepts/06/balanced-price-range)."""
+
+    low: float
+    high: float
+    bull_index: int
+    bear_index: int
+
+    @property
+    def ce(self) -> float:
+        return (self.low + self.high) / 2.0
+
+
+@dataclass
+class LiquidityVoid:
+    """A wide one-sided expansion span price tends to re-fill
+    (concepts/02/liquidity-void)."""
+
+    start_index: int
+    end_index: int
+    direction: str      # "bull" | "bear"
+    low: float
+    high: float
+
+
+@dataclass
+class PropulsionBlock:
+    """The takeoff candle after an OB that launches the displacement
+    (concepts/07/propulsion-block)."""
+
+    index: int
+    ts: datetime
+    direction: str      # "bull" | "bear"
+    low: float
+    high: float
+
+
+@dataclass
 class Breaker:
     """A failed order block that flipped polarity
     (concepts/08-breaker-blocks/breaker-block).
