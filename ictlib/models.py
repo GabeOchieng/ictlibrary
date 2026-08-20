@@ -467,6 +467,21 @@ class Sweep:
 # Signal (produced by the scanner that sits on top of the primitives)
 # --------------------------------------------------------------------------- #
 @dataclass
+class Unicorn:
+    """Unicorn model — an A+ confluence stack (concepts/31-models/unicorn-model):
+    a breaker block with a same-direction FVG nested inside, HTF-bias aligned,
+    with a liquidity sweep preceding the breaker."""
+
+    index: int          # breaker candle
+    ts: datetime
+    direction: str      # "bull" | "bear"
+    low: float          # breaker zone
+    high: float
+    breaker_index: int
+    fvg_index: int
+
+
+@dataclass
 class Signal:
     direction: str      # "long" | "short"
     ts: datetime
@@ -478,6 +493,7 @@ class Signal:
     reasons: list[str]
     score: int
     killzone: Optional[str] = None
+    models: list[str] = field(default_factory=list)   # named models matched
 
     @property
     def risk(self) -> float:

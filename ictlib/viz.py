@@ -399,6 +399,21 @@ def render_html(
                      f'<title>{ev.kind} {ev.direction} @ {_fmt_price(ev.level)}</title>')
     parts.append('</g>')
 
+    # ---- Unicorn zones --------------------------------------------------- #
+    if analysis.unicorns:
+        parts.append('<g data-layer="unicorn">')
+        for u in analysis.unicorns:
+            if u.index < start:
+                continue
+            x1 = x_of(u.index)
+            yt, yb = y_of(u.high), y_of(u.low)
+            parts.append(f'<rect x="{x1:.1f}" y="{yt:.1f}" width="{right_edge()-x1:.1f}" '
+                         f'height="{max(yb-yt,1):.1f}" fill="{C_ENTRY}" fill-opacity="0.10" '
+                         f'stroke="{C_ENTRY}" stroke-width="1.4" stroke-dasharray="1 0"/>')
+            parts.append(f'<text x="{x1+3:.1f}" y="{yt-2:.1f}" class="tag" '
+                         f'fill="{C_ENTRY}">🦄 Unicorn</text>')
+        parts.append('</g>')
+
     # ---- signals --------------------------------------------------------- #
     parts.append('<g data-layer="signals">')
     for s in (signals or []):
@@ -415,9 +430,11 @@ def render_html(
                          f'y2="{yy:.1f}" stroke="{col}" stroke-width="1.1" '
                          f'stroke-dasharray="5 3"/>')
         arrow = "▲" if s.direction == "long" else "▼"
+        label = f'{arrow} {s.direction.upper()} score {s.score}'
+        if s.models:
+            label += f' · {s.models[0]}'
         parts.append(f'<text x="{x+3:.1f}" y="{zt-3:.1f}" class="sig" '
-                     f'fill="{C_ENTRY}">{arrow} {s.direction.upper()} '
-                     f'score {s.score}</text>')
+                     f'fill="{C_ENTRY}">{html.escape(label)}</text>')
     parts.append('</g>')
 
     parts.append('</svg>')
@@ -442,6 +459,7 @@ def render_html(
         ("crt", "CRT ranges", C_OB_BULL),
         ("pools", "Liquidity Pools", C_BEAR),
         ("sweeps", "Sweeps", C_SWEEP),
+        ("unicorn", "Unicorn zones", C_ENTRY),
         ("signals", "Signals", C_ENTRY),
     ]
     legend = "".join(

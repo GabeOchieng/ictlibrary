@@ -15,7 +15,7 @@ from .models import (
     Candle, Swing, StructureEvent, FVG, OrderBlock, LiquidityPool, Sweep,
     DealingRange, Breaker, RejectionBlock, VolumeImbalance,
     SessionRange, AsianRange, IPDALevels,
-    TurtleSoup, CRTSetup, QuarterlyContext, MTFContext,
+    TurtleSoup, CRTSetup, QuarterlyContext, MTFContext, Unicorn,
 )
 from .concepts import (
     find_swings, find_structure_events, current_bias, dealing_range,
@@ -47,6 +47,7 @@ class Analysis:
     crt_setups: List[CRTSetup] = field(default_factory=list)
     quarterly: Optional[QuarterlyContext] = None
     mtf: Optional[MTFContext] = None
+    unicorns: List[Unicorn] = field(default_factory=list)
     dealing_range: Optional[DealingRange] = None
     bias: str = "neutral"
     killzone: Optional[str] = None
@@ -119,6 +120,7 @@ class Analysis:
             "phase": self.quarterly.phase if self.quarterly else None,
             "htf_bias": self.mtf.bias if self.mtf else None,
             "htf_reads": [(r.label, r.bias) for r in self.mtf.reads] if self.mtf else [],
+            "unicorns": len(self.unicorns),
         }
 
 
@@ -175,7 +177,7 @@ def analyze(
         for vi in vis:
             vi.pd_side = drange.classify(vi.ce)
 
-    return Analysis(
+    result = Analysis(
         candles=candles,
         pip=pip,
         swings=swings,
@@ -198,3 +200,7 @@ def analyze(
         bias=current_bias(events),
         killzone=active_killzone(candles[-1].ts) if candles else None,
     )
+    # Unicorns depend on breakers + fvgs + bias, so classify once the snapshot exists.
+    from .setups import find_unicorns
+    result.unicorns = find_unicorns(result)
+    return result

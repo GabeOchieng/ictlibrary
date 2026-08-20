@@ -20,8 +20,9 @@ from typing import List, Optional
 
 from .models import Signal, Sweep
 from .analysis import Analysis, analyze
-from .concepts.killzones import active_killzone
+from .concepts.killzones import active_killzone, in_silver_bullet
 from .concepts.ote import ote_from_leg
+from .setups import classify_models
 
 
 def scan(
@@ -83,9 +84,22 @@ def scan(
         if score < min_score:
             continue
 
+        mss_ts = candles[mss.index].ts
+        kz = active_killzone(mss_ts)
+        bias_aligned = _bias_aligned(analysis, direction)
+        models = classify_models(
+            killzone=kz,
+            sb_window=in_silver_bullet(mss_ts),
+            sweep_killzone=active_killzone(candles[sweep.index].ts),
+            bias_aligned=bias_aligned,
+            has_fvg=mss.has_fvg,   # an MSS always leaves an FVG in the break
+        )
+        if models:
+            reasons.append("models: " + ", ".join(models))
+
         signals.append(Signal(
             direction=direction,
-            ts=candles[mss.index].ts,
+            ts=mss_ts,
             index=mss.index,
             entry=entry,
             entry_zone=zone,
@@ -93,7 +107,8 @@ def scan(
             targets=targets,
             reasons=reasons,
             score=score,
-            killzone=active_killzone(candles[mss.index].ts),
+            killzone=kz,
+            models=models,
         ))
 
     signals.sort(key=lambda s: (s.index, -s.score))
@@ -111,6 +126,15 @@ def scan_candles(candles, **kw) -> List[Signal]:
 # --------------------------------------------------------------------------- #
 # helpers
 # --------------------------------------------------------------------------- #
+def _bias_aligned(analysis, direction: str) -> bool:
+    """True if the trade direction agrees with the HTF bias (if a multi-timeframe
+    context is present) or otherwise the structural bias."""
+    want = "bullish" if direction == "long" else "bearish"
+    if analysis.mtf is not None and analysis.mtf.bias != "neutral":
+        return analysis.mtf.bias == want
+    return analysis.bias == want
+
+
 def _first_mss_after(analysis, sweep_index, direction, window):
     for ev in analysis.events:
         if ev.kind != "MSS" or ev.direction != direction:
@@ -238,5 +262,12 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
             score += 1
         else:
             reasons.append(f"⚠ against HTF bias {mtf.bias} ({stack})")
+
+    # Unicorn A+ zone overlapping the entry (breaker + nested FVG + bias + sweep).
+    want_dir2 = "bull" if direction == "long" else "bear"
+    if any(u.direction == want_dir2 and u.low <= entry <= u.high
+           for u in analysis.unicorns):
+        reasons.append("Unicorn A+ zone at entry (breaker + nested FVG)")
+        score += 2
 
     return reasons, score

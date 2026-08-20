@@ -77,8 +77,9 @@ def _print_report(analysis, signals, instrument, granularity) -> None:
     for s in signals:
         rr = f"{s.rr:.2f}" if s.rr else "—"
         tgt = ", ".join(f"{t:.5f}" for t in s.targets) or "—"
+        tag = f"  «{', '.join(s.models)}»" if s.models else ""
         print(f"\n  [{s.direction.upper()}] score {s.score}  "
-              f"{s.ts.strftime('%Y-%m-%d %H:%M')}  ({s.killzone or 'no KZ'})")
+              f"{s.ts.strftime('%Y-%m-%d %H:%M')}  ({s.killzone or 'no KZ'}){tag}")
         print(f"    entry {s.entry:.5f}  zone {s.entry_zone[0]:.5f}-{s.entry_zone[1]:.5f}")
         print(f"    stop  {s.stop:.5f}  target {tgt}  RR {rr}")
         for r in s.reasons:
