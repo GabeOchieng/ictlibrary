@@ -177,32 +177,36 @@
           <!-- concepts container -->
           <rect class="grp" x="110" y="212" width="740" height="150" rx="12"/>
           <text class="lbl sm mut" x="128" y="234">concepts/ — pure primitives (stdlib only)</text>
-          <!-- 7 boxes -->
+          <!-- 8 boxes -->
           <g>
-            <rect class="node" x="128" y="270" width="94" height="70" rx="8"/>
-            <text class="lbl sm" x="175" y="300" text-anchor="middle">structure</text>
-            <text class="lbl sm mut" x="175" y="318" text-anchor="middle" font-size="10">swings·BOS</text>
-            <text class="lbl sm mut" x="175" y="331" text-anchor="middle" font-size="10">CHoCH·MSS</text>
+            <rect class="node" x="128" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="169" y="300" text-anchor="middle" font-size="11">structure</text>
+            <text class="lbl sm mut" x="169" y="316" text-anchor="middle" font-size="9">swings·BOS</text>
+            <text class="lbl sm mut" x="169" y="328" text-anchor="middle" font-size="9">CHoCH·MSS</text>
 
-            <rect class="node" x="230" y="270" width="94" height="70" rx="8"/>
-            <text class="lbl sm" x="277" y="300" text-anchor="middle" font-size="11">displace-</text>
-            <text class="lbl sm" x="277" y="314" text-anchor="middle" font-size="11">ment</text>
+            <rect class="node" x="218" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="259" y="302" text-anchor="middle" font-size="11">displace-</text>
+            <text class="lbl sm" x="259" y="316" text-anchor="middle" font-size="11">ment</text>
 
-            <rect class="node" x="332" y="270" width="94" height="70" rx="8"/>
-            <text class="lbl sm" x="379" y="304" text-anchor="middle">fvg</text>
+            <rect class="node" x="308" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="349" y="306" text-anchor="middle" font-size="11">fvg</text>
 
-            <rect class="node" x="434" y="270" width="106" height="70" rx="8"/>
-            <text class="lbl sm" x="487" y="300" text-anchor="middle" font-size="11">order_</text>
-            <text class="lbl sm" x="487" y="314" text-anchor="middle" font-size="11">blocks</text>
+            <rect class="node" x="398" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="439" y="302" text-anchor="middle" font-size="11">order_</text>
+            <text class="lbl sm" x="439" y="316" text-anchor="middle" font-size="11">blocks</text>
 
-            <rect class="node" x="548" y="270" width="94" height="70" rx="8"/>
-            <text class="lbl sm" x="595" y="304" text-anchor="middle">liquidity</text>
+            <rect class="node" x="488" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="529" y="306" text-anchor="middle" font-size="11">liquidity</text>
 
-            <rect class="node" x="650" y="270" width="94" height="70" rx="8"/>
-            <text class="lbl sm" x="697" y="304" text-anchor="middle">killzones</text>
+            <rect class="node accent" x="578" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm accent" x="619" y="302" text-anchor="middle" font-size="11">pd_arrays</text>
+            <text class="lbl sm mut" x="619" y="316" text-anchor="middle" font-size="9">prem/disc</text>
 
-            <rect class="node" x="752" y="270" width="86" height="70" rx="8"/>
-            <text class="lbl sm" x="795" y="304" text-anchor="middle">ote</text>
+            <rect class="node" x="668" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="709" y="306" text-anchor="middle" font-size="11">killzones</text>
+
+            <rect class="node" x="758" y="270" width="82" height="70" rx="8"/>
+            <text class="lbl sm" x="799" y="306" text-anchor="middle" font-size="11">ote</text>
           </g>
 
           <!-- arrow to analyze -->
@@ -299,7 +303,7 @@
           <!-- confluence -->
           <rect class="grp" x="256" y="228" width="424" height="64" rx="10"/>
           <text class="lbl sm mut" x="468" y="252" text-anchor="middle">confluence → score</text>
-          <text class="lbl sm" x="468" y="274" text-anchor="middle">killzone · HTF bias · OTE 0.62–0.79 · EQH/EQL swept</text>
+          <text class="lbl sm" x="468" y="274" text-anchor="middle">killzone · bias · premium/discount · OTE · EQH/EQL swept</text>
           <path class="edge" marker-end="url(#ar2)" d="M586,228 L586,138"/>
           <text class="etxt" x="596" y="190" text-anchor="start">scores</text>
         </svg>
@@ -331,6 +335,14 @@
         <p>The reversal-grade break: a CHoCH that carries displacement <em>and</em>
         leaves a fair value gap in the breaking move.</p>
         <code>CHoCH + displacement + FVG</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>pd_arrays</h3><span class="mod">pd_arrays.py</span> <span class="tag state">reference frame</span></div>
+        <p>The dealing range (recent LTH/LTL) and its equilibrium; classifies every
+        price and PD array as premium (sell-side) or discount (buy-side). Longs
+        originate at a discount, shorts at a premium.</p>
+        <code>EQ = (LTH+LTL)/2 · |depth|=.79 → OTE</code>
       </div>
 
       <div class="card">

@@ -18,9 +18,11 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 
 | Concept | Module | Rule (from the knowledge library) |
 |---|---|---|
-| **Swing highs/lows** | `concepts/structure.py` | n-bar fractal: `H_n > H_{n±1..w}` |
+| **Swing highs/lows** | `concepts/structure.py` | n-bar fractal: `H_n > H_{n±1..w}`; STH/ITH/LTH hierarchy |
 | **BOS / CHoCH** | `concepts/structure.py` | close beyond last opposite swing; continuation vs first reversal |
 | **MSS** | `concepts/structure.py` | a CHoCH **with displacement + FVG in the break** |
+| **Dealing range + equilibrium** | `concepts/pd_arrays.py` | bounds = recent LTH/LTL; `EQ = (LTH+LTL)/2` |
+| **Premium / discount** | `concepts/pd_arrays.py` | above EQ = premium (sell-side), below = discount (buy-side); signed depth where `0.79` = OTE |
 | **Displacement** | `concepts/displacement.py` | `body ≥ 1.5×avg`, `body/range ≥ 0.70`, `opp_wick/range ≤ 0.20` |
 | **Fair Value Gap** | `concepts/fvg.py` | bull `L_{n+1} > H_{n-1}`, bear `H_{n+1} < L_{n-1}`; CE = midpoint |
 | **Order Block** | `concepts/order_blocks.py` | last opposite candle before a structure-breaking displacement; body = MT zone |
@@ -99,7 +101,10 @@ The included scanner encodes the classic ICT reversal:
    pools (the draw on liquidity), nearest first.
 
 Confluences add to a score: active killzone, HTF bias aligned, entry inside the
-OTE band, and whether a dense EQH/EQL pool was the one swept.
+OTE band, whether a dense EQH/EQL pool was the one swept, and — per ICT's
+premium/discount discipline — whether the entry sits on the correct side of the
+dealing-range equilibrium (longs at a discount, shorts at a premium). Entries on
+the wrong side of EQ are flagged rather than silently scored.
 
 ---
 
@@ -139,7 +144,7 @@ ictlib/
   cli.py               python -m ictlib.cli
   sample_setups.py     canonical hand-authored setups (shared by demo + tests)
   concepts/            structure, displacement, fvg, order_blocks,
-                       liquidity, killzones, ote
+                       liquidity, pd_arrays, killzones, ote
   data/                oanda.py (v20 REST), csv_loader.py
 examples/              generate_sample.py, rendered chart
 sample_data/           EUR_USD_M15.csv
@@ -148,7 +153,10 @@ tests/                 22 deterministic tests
 
 ## Roadmap
 
-- Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
-- Backtester on top of `scan()` with equity curve + R distribution.
-- More setups: Silver Bullet, Judas Swing, Turtle Soup, OTE-continuation.
-- Live/paper execution adapter for OANDA.
+- [x] **PD arrays** — dealing range, equilibrium, premium/discount classification.
+- [ ] Breaker & rejection blocks; volume imbalance / inversion FVG.
+- [ ] Asian range, session ranges, IPDA lookback ranges.
+- [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
+- [ ] Backtester on top of `scan()` with equity curve + R distribution.
+- [ ] Named models: Silver Bullet, Judas Swing, Turtle Soup, 2022 model.
+- [ ] Live/paper execution adapter for OANDA.
