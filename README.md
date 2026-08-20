@@ -35,6 +35,9 @@ the formulas in that wiki are reproduced verbatim in each module's docstring.
 | **Session ranges** | `concepts/sessions.py` | NY-time session map; most-recent session high/low |
 | **Asian range** | `concepts/asian_range.py` | Asia-session high/low, Judas-sweep side, 0.5–2× projections |
 | **IPDA lookback** | `concepts/ipda.py` | 20/40/60 trading-day reference highs/lows |
+| **Turtle Soup** | `concepts/turtle_soup.py` | failed breakout = sweep + confirming reversal displacement |
+| **Quarterly Theory / PO3** | `concepts/quarterly.py` | True Day Open, daily quarters → AMD phases |
+| **CRT** *(community)* | `concepts/crt.py` | HTF candle-range sweep → opposite bound (non-ICT-original) |
 | **OTE** | `concepts/ote.py` | 0.62–0.79 retracement band of a measured leg |
 
 Each detector marks **state** where the concept has it: FVGs and order blocks
@@ -188,7 +191,7 @@ ictlib/
   concepts/            structure, displacement, fvg, order_blocks,
                        breaker_blocks, rejection_blocks, imbalance,
                        liquidity, pd_arrays, sessions, asian_range, ipda,
-                       killzones, ote
+                       turtle_soup, quarterly, crt, killzones, ote
   data/                oanda.py (v20 REST), csv_loader.py
 examples/              generate_sample.py, rendered chart
 sample_data/           EUR_USD_M15.csv
@@ -201,6 +204,7 @@ tests/                 22 deterministic tests
 - [x] **Breaker & rejection blocks, volume imbalance** — the rest of the PD-array family.
 - [x] **Sessions, Asian range, IPDA lookback** — time-based draw-on-liquidity levels.
 - [x] **Risk management + walk-forward backtester** — position sizing, R-multiples, equity curve.
+- [x] **Turtle Soup, Quarterly Theory / PO3, CRT** — named patterns + time-fractal phases.
 - [ ] Multi-timeframe confluence (HTF bias from a higher-TF `Analysis`).
-- [ ] Named models: Silver Bullet, Judas Swing, Turtle Soup, 2022 model.
+- [ ] Named models: Silver Bullet, Judas Swing, 2022 model.
 - [ ] Live/paper execution adapter for OANDA.
