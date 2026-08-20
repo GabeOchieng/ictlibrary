@@ -47,6 +47,10 @@
   }
   .lede{font-size:18px; color:var(--muted); max-width:64ch; margin:0}
   .lede b{color:var(--ink); font-weight:600}
+  .kpis{display:flex; flex-wrap:wrap; gap:8px 10px; margin-top:18px}
+  .kpi{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted);
+    border:1px solid var(--line); border-radius:20px; padding:4px 12px}
+  .kpi b{color:var(--accent); font-weight:600}
 
   .rule{height:1px; background:var(--line); border:0; margin:44px 0}
 
@@ -132,6 +136,12 @@
     building blocks of ICT price analysis. The <b>primitive layer detects; everything
     downstream consumes</b> — a scanner, a chart, and a backtester all read the
     same <span class="mono">Analysis</span> snapshot instead of re-deriving it.</p>
+    <div class="kpis">
+      <span class="kpi"><b>~24/32</b> categories complete</span>
+      <span class="kpi"><b>104</b> tests passing</span>
+      <span class="kpi"><b>4</b> data sources</span>
+      <span class="kpi"><b>real-data</b> backtested (2009 XAUUSD)</span>
+    </div>
   </header>
 
   <hr class="rule">
@@ -295,10 +305,10 @@
           <path class="edge" marker-end="url(#ar2)" d="M680,116 C716,116 724,140 760,146"/>
           <rect class="node" x="760" y="30" width="200" height="48" rx="9"/>
           <text class="lbl sm" x="860" y="50" text-anchor="middle">Stop</text>
-          <text class="lbl sm mut" x="860" y="66" text-anchor="middle">beyond sweep extreme</text>
+          <text class="lbl sm mut" x="860" y="66" text-anchor="middle">sweep or PD-array invalidation</text>
           <rect class="node" x="760" y="122" width="200" height="48" rx="9"/>
           <text class="lbl sm" x="860" y="142" text-anchor="middle">Targets</text>
-          <text class="lbl sm mut" x="860" y="158" text-anchor="middle">DOL: pools · sessions · IPDA</text>
+          <text class="lbl sm mut" x="860" y="158" text-anchor="middle">DOL pools + SD projections</text>
 
           <!-- confluence -->
           <rect class="grp" x="256" y="228" width="424" height="64" rx="10"/>
@@ -456,8 +466,36 @@
       <div class="card">
         <div class="top"><h3>ote</h3><span class="mod">ote.py</span></div>
         <p>Optimal Trade Entry band on a measured leg; the 0.62–0.79 retracement is
-        the entry-depth confluence.</p>
-        <code>retrace ∈ [0.62, 0.79]</code>
+        the entry-depth confluence, plus −0.5…−2.0 SD projection targets.</p>
+        <code>retrace ∈ [0.62, 0.79] · SD targets</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>fvg_variants</h3><span class="mod">fvg_variants.py</span></div>
+        <p>Inversion FVG (traded-through polarity flip), balanced price range
+        (overlapping bull+bear FVG), and nested FVGs.</p>
+        <code>IFVG · BPR · nested</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>ob_variants + gaps</h3><span class="mod">ob_variants · opening_gaps</span></div>
+        <p>Propulsion block (the takeoff candle) and the NDOG / NWOG opening-gap
+        reference zones price tends to fill.</p>
+        <code>propulsion · NDOG · NWOG</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>smt</h3><span class="mod">smt · intermarket</span> <span class="tag">2 symbols</span></div>
+        <p>Smart-Money-Technique divergence between correlated assets, and the
+        DXY intermarket read for USD pairs.</p>
+        <code>A new extreme · B fails</code>
+      </div>
+
+      <div class="card">
+        <div class="top"><h3>news</h3><span class="mod">news.py</span> <span class="tag">calendar</span></div>
+        <p>No-trade blackout windows around high-impact releases — FOMC, NFP,
+        CPI — per the ICT protocol table.</p>
+        <code>±window by event kind</code>
       </div>
 
     </div>
@@ -465,6 +503,34 @@
       <span><i class="dot bull"></i> bullish variant</span>
       <span><i class="dot bear"></i> bearish variant</span>
       <span><i class="tag state" style="padding:1px 7px">state</i> detector carries live mitigation / swept state</span>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ============ BEYOND DETECTION ============ -->
+  <section>
+    <h2>Beyond detection — what consumes the snapshot</h2>
+    <div class="grid-cards">
+      <div class="card">
+        <div class="top"><h3>setups</h3><span class="mod">setups.py</span> <span class="tag state">named models</span></div>
+        <p>Classifies each signal into the ICT models it satisfies — 2022 Model,
+        Silver Bullet, Judas Swing — and detects the Unicorn A+ stack.</p>
+        <code>killzone + bias + sweep + FVG → model</code>
+      </div>
+      <div class="card">
+        <div class="top"><h3>risk</h3><span class="mod">risk.py</span></div>
+        <p>Position sizing (<code>risk_$ / sl_distance</code>), R-multiples for
+        longs and shorts, partial-take schedules, per-instrument pip values.</p>
+        <code>lots · R · partials</code>
+      </div>
+      <div class="card">
+        <div class="top"><h3>backtest</h3><span class="mod">backtest.py</span> <span class="tag state">walk-forward</span></div>
+        <p>Re-analyses only the bars seen so far (no lookahead), simulates fills /
+        stops / targets, reports R stats + an equity curve. Validated on real
+        2009 XAUUSD (134 trades, 57% win).</p>
+        <code>win rate · expectancy · max DD</code>
+      </div>
     </div>
   </section>
 
