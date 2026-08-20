@@ -33,7 +33,7 @@ from .scanner import scan, scan_candles
 from .risk import RiskParams, position_size, r_multiple, size_signal
 from .backtest import backtest, BacktestResult, Trade
 from .mtf import multi_timeframe_bias, resample_tf
-from .setups import classify_models, find_unicorns
+from .setups import classify_models, find_unicorns, find_diamonds
 from .smt import find_smt_divergence
 from .intermarket import dollar_index_smt, intermarket_bias
 from .news import in_blackout, news_windows
@@ -54,6 +54,6 @@ __all__ = [
     "RiskParams", "position_size", "r_multiple", "size_signal",
     "backtest", "BacktestResult", "Trade",
     "multi_timeframe_bias", "resample_tf",
-    "classify_models", "find_unicorns",
+    "classify_models", "find_unicorns", "find_diamonds",
     "__version__",
 ]

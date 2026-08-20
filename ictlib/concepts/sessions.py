@@ -100,6 +100,23 @@ def session_range(candles: List[Candle], name: str) -> Optional[SessionRange]:
     )
 
 
+def pre_open_range(candles: List[Candle]) -> Optional[SessionRange]:
+    """The 08:00-09:30 NY US-equity pre-cash-open range (used by the Venom model,
+    concepts/31-models/venom-model)."""
+    start, end = _m(8), _m(9, 30)
+    members = [(i, _instance_key(candles[i].ts, start))
+               for i in range(len(candles))
+               if _in(ny_minutes(candles[i].ts), start, end)]
+    if not members:
+        return None
+    last_key = members[-1][1]
+    idxs = [i for i, k in members if k == last_key]
+    hi = max(idxs, key=lambda i: candles[i].high)
+    lo = min(idxs, key=lambda i: candles[i].low)
+    return SessionRange("Pre-Open", candles[hi].high, candles[lo].low,
+                        hi, lo, idxs[0], idxs[-1])
+
+
 def all_session_ranges(candles: List[Candle]) -> List[SessionRange]:
     out = []
     for name, _, _ in SESSION_WINDOWS:

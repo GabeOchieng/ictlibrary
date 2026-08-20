@@ -20,7 +20,8 @@ from typing import List, Optional
 
 from .models import Signal, Sweep
 from .analysis import Analysis, analyze
-from .concepts.killzones import active_killzone, in_silver_bullet
+from .concepts.killzones import active_killzone, in_silver_bullet, ny_minutes
+from .concepts.sessions import pre_open_range
 from .concepts.ote import ote_from_leg, sd_projections, SD_OTE, measured_leg
 from .setups import classify_models
 
@@ -42,6 +43,7 @@ def scan(
     """
     signals: List[Signal] = []
     candles = analysis.candles
+    por = pre_open_range(candles)   # for the Venom model (US-index pre-cash-open)
 
     for sweep in analysis.sweeps:
         # A BSL sweep (high taken) sets up a SHORT; SSL sweep sets up a LONG.
@@ -88,12 +90,21 @@ def scan(
         mss_ts = candles[mss.index].ts
         kz = active_killzone(mss_ts)
         bias_aligned = _bias_aligned(analysis, direction)
+        # Venom: sweep took a pre-open-range bound and the MSS is in 09:30-11:00 NY.
+        venom = False
+        if por is not None:
+            took = min(abs(sweep.level - por.high),
+                       abs(sweep.level - por.low)) <= 3 * analysis.pip
+            m = ny_minutes(mss_ts)
+            venom = took and (9 * 60 + 30) <= m < 11 * 60
+
         models = classify_models(
             killzone=kz,
             sb_window=in_silver_bullet(mss_ts),
             sweep_killzone=active_killzone(candles[sweep.index].ts),
             bias_aligned=bias_aligned,
             has_fvg=mss.has_fvg,   # an MSS always leaves an FVG in the break
+            venom=venom,
         )
         if models:
             reasons.append("models: " + ", ".join(models))
@@ -301,6 +312,12 @@ def _score(analysis, sweep, mss, fvg, ob, direction, entry):
            for u in analysis.unicorns):
         reasons.append("Unicorn A+ zone at entry (breaker + nested FVG)")
         score += 2
+
+    # Diamond pattern: both-side liquidity swept before this break.
+    if any(d["break_index"] == mss.index and d["direction"] == want_dir2
+           for d in analysis.diamonds):
+        reasons.append("diamond (both-side sweep before break)")
+        score += 1
 
     # Stop-run classification (concepts/29-stop-runs): name the PD array the
     # sweep ran into.

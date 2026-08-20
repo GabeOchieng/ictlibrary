@@ -54,6 +54,7 @@ class Analysis:
     quarterly: Optional[QuarterlyContext] = None
     mtf: Optional[MTFContext] = None
     unicorns: List[Unicorn] = field(default_factory=list)
+    diamonds: list = field(default_factory=list)
     inversion_fvgs: List[InversionFVG] = field(default_factory=list)
     bpr: List[BalancedPriceRange] = field(default_factory=list)
     nested_fvgs: list = field(default_factory=list)
@@ -139,6 +140,7 @@ class Analysis:
             "htf_bias": self.mtf.bias if self.mtf else None,
             "htf_reads": [(r.label, r.bias) for r in self.mtf.reads] if self.mtf else [],
             "unicorns": len(self.unicorns),
+            "diamonds": len(self.diamonds),
             "inversion_fvgs": len(self.inversion_fvgs),
             "bpr": len(self.bpr),
             "nested_fvgs": len(self.nested_fvgs),
@@ -264,7 +266,8 @@ def analyze(
         killzone=active_killzone(candles[-1].ts) if candles else None,
     )
     # These depend on the assembled snapshot, so classify once it exists.
-    from .setups import find_unicorns
+    from .setups import find_unicorns, find_diamonds
     result.unicorns = find_unicorns(result)
+    result.diamonds = find_diamonds(result)
     result.stop_runs = classify_stop_runs(result)
     return result

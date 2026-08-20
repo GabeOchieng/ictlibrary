@@ -27,6 +27,7 @@ def classify_models(
     sweep_killzone,    # active killzone at the sweep bar (or None)
     bias_aligned: bool,
     has_fvg: bool,
+    venom: bool = False,
 ) -> List[str]:
     """Return the named models this signal qualifies as."""
     out: List[str] = []
@@ -37,6 +38,33 @@ def classify_models(
         out.append("Silver Bullet")
     if bias_aligned and sweep_killzone in ("London Open", "NY AM"):
         out.append("Judas Swing")
+    if venom:
+        out.append("Venom")
+    return out
+
+
+def find_diamonds(analysis, *, window: int = 20) -> List[dict]:
+    """Diamond pattern (concepts/31-models/diamond-pattern): BOTH BSL and SSL
+    swept within a consolidation, then a directional break — both-side liquidity
+    is gone before the move, so few stops remain to fault it."""
+    sweeps = sorted(analysis.sweeps, key=lambda s: s.index)
+    bsls = [s for s in sweeps if s.kind == "BSL"]
+    ssls = [s for s in sweeps if s.kind == "SSL"]
+    out: List[dict] = []
+    seen: set = set()
+    for b in bsls:
+        for s in ssls:
+            if abs(b.index - s.index) > window:
+                continue
+            last = max(b.index, s.index)
+            ev = next((e for e in analysis.events
+                       if e.index > last and e.kind in ("MSS", "BOS")), None)
+            if ev is None or ev.index in seen:
+                continue
+            seen.add(ev.index)
+            out.append({"bsl_index": b.index, "ssl_index": s.index,
+                        "break_index": ev.index, "direction": ev.direction})
+            break
     return out
 
 
